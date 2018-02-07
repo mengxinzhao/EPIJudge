@@ -10,7 +10,6 @@ int CalculateBonus(const vector<int>& productivity) {
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"productivity"};
-  generic_test_main(argc, argv, param_names, "bonus.tsv", &CalculateBonus);
+  generic_test_main(argc, argv, "bonus.tsv", &CalculateBonus);
   return 0;
 }

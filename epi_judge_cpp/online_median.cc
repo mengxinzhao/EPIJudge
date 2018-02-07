@@ -15,8 +15,6 @@ vector<double> OnlineMedianWrapper(const vector<int>& sequence) {
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"sequence"};
-  generic_test_main(argc, argv, param_names, "online_median.tsv",
-                    &OnlineMedianWrapper);
+  generic_test_main(argc, argv, "online_median.tsv", &OnlineMedianWrapper);
   return 0;
 }

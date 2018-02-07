@@ -11,9 +11,7 @@ int FindClosestElementsInSortedArrays(
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"sorted_arrays"};
-  generic_test_main(argc, argv, param_names,
-                    "minimum_distance_3_sorted_arrays.tsv",
+  generic_test_main(argc, argv, "minimum_distance_3_sorted_arrays.tsv",
                     &FindClosestElementsInSortedArrays);
   return 0;
 }

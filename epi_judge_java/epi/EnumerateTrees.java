@@ -17,10 +17,10 @@ public class EnumerateTrees {
     return null;
   }
 
-  public static List<Integer> serializeStructure(BinaryTreeNode<Integer> tree) {
+  public static List<Integer> serializeStructure(BinaryTreeNode<Integer> root) {
     List<Integer> result = new ArrayList<>();
     Stack<BinaryTreeNode<Integer>> stack = new Stack<>();
-    stack.push(tree);
+    stack.push(root);
     while (!stack.empty()) {
       BinaryTreeNode<Integer> p = stack.pop();
       result.add(p == null ? 0 : 1);
@@ -34,9 +34,9 @@ public class EnumerateTrees {
 
   @EpiTest(testfile = "enumerate_trees.tsv")
   public static List<List<Integer>>
-  generateAllBinaryTreesWrapper(TestTimer timer, int numNodes) {
+  generateAllBinaryTreesWrapper(TestTimer timer, int i) {
     timer.start();
-    List<BinaryTreeNode<Integer>> result = generateAllBinaryTrees(numNodes);
+    List<BinaryTreeNode<Integer>> result = generateAllBinaryTrees(i);
     timer.stop();
 
     List<List<Integer>> serialized = new ArrayList<>();

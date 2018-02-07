@@ -7,13 +7,6 @@ def rearrange(A):
     return
 
 
-@enable_timer_hook
-def rearrange_wrapper(timer, A):
-    timer.start()
-    rearrange(A)
-    timer.stop()
-
-
 def check_answer(A):
     for i in range(len(A)):
         if i % 2:
@@ -22,13 +15,20 @@ def check_answer(A):
             if i + 1 < len(A):
                 if A[i] < A[i + 1]:
                     raise TestFailureException('')
-                else:
-                    if i > 0:
-                        if A[i - 1] < A[i]:
-                            raise TestFailureException('')
+        else:
+            if i > 0:
+                if A[i - 1] < A[i]:
+                    raise TestFailureException('')
             if i + 1 < len(A):
                 if A[i + 1] < A[i]:
                     raise TestFailureException('')
+
+
+@enable_timer_hook
+def rearrange_wrapper(timer, A):
+    timer.start()
+    rearrange(A)
+    timer.stop()
 
     check_answer(A)
 

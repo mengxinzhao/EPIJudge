@@ -65,7 +65,6 @@ void RunTest(const std::vector<Op>& commands) {
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"commands"};
-  generic_test_main(argc, argv, param_names, "lru_cache.tsv", &RunTest);
+  generic_test_main(argc, argv, "lru_cache.tsv", &RunTest);
   return 0;
 }

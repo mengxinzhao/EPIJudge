@@ -10,7 +10,6 @@ bool HasThreeSum(vector<int> A, int t) {
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"A", "t"};
-  generic_test_main(argc, argv, param_names, "three_sum.tsv", &HasThreeSum);
+  generic_test_main(argc, argv, "three_sum.tsv", &HasThreeSum);
   return 0;
 }

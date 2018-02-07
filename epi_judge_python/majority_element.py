@@ -1,10 +1,10 @@
-def majority_search(stream):
+def majority_search(input_stream):
     # Implement this placeholder.
     return ''
 
 
-def majority_search_wrapper(stream):
-    return majority_search(iter(stream))
+def majority_search_wrapper(input_stream):
+    return majority_search(iter(input_stream))
 
 
 from test_framework import test_utils_generic_main, test_utils

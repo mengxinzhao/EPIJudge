@@ -16,20 +16,20 @@ public class ReplaceAndRemove {
 
   @EpiTest(testfile = "replace_and_remove.tsv")
   public static List<String>
-  replaceAndRemoveWrapper(TestTimer timer, Integer size, List<String> s) {
-    char[] sCopy = new char[s.size()];
+  replaceAndRemoveWrapper(TestTimer timer, Integer size, List<String> inputS) {
+    char[] s = new char[inputS.size()];
     for (int i = 0; i < size; ++i) {
-      if (!s.get(i).isEmpty()) {
-        sCopy[i] = s.get(i).charAt(0);
+      if (!inputS.get(i).isEmpty()) {
+        s[i] = inputS.get(i).charAt(0);
       }
     }
     timer.start();
-    Integer resSize = replaceAndRemove(size, sCopy);
+    Integer resSize = replaceAndRemove(size, s);
     timer.stop();
 
     List<String> result = new ArrayList<>();
     for (int i = 0; i < resSize; ++i) {
-      result.add(Character.toString(sCopy[i]));
+      result.add(Character.toString(s[i]));
     }
     return result;
   }

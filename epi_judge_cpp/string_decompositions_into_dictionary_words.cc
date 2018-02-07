@@ -12,8 +12,7 @@ vector<int> FindAllSubstrings(const string& s, const vector<string>& words) {
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"s", "words"};
-  generic_test_main(argc, argv, param_names,
+  generic_test_main(argc, argv,
                     "string_decompositions_into_dictionary_words.tsv",
                     &FindAllSubstrings);
   return 0;

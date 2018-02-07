@@ -10,9 +10,11 @@ def find_LCA(tree, s, b):
 
 
 @enable_timer_hook
-def lca_wrapper(timer, tree, s, b):
+def lca_wrapper(timer, tree, key1, key2):
+    node1 = must_find_node(tree, key1)
+    node2 = must_find_node(tree, key2)
     timer.start()
-    result = find_LCA(tree, must_find_node(tree, s), must_find_node(tree, b))
+    result = find_LCA(tree, node1, node2)
     timer.stop()
     if result is None:
         raise TestFailureException("Result can't be None")

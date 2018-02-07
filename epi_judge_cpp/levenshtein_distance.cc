@@ -12,8 +12,7 @@ int LevenshteinDistance(const string& A, const string& B) {
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"A", "B"};
-  generic_test_main(argc, argv, param_names, "levenshtein_distance.tsv",
+  generic_test_main(argc, argv, "levenshtein_distance.tsv",
                     &LevenshteinDistance);
   return 0;
 }

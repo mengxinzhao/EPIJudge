@@ -40,11 +40,11 @@ public class SortedListToBst {
 
   @EpiTest(testfile = "sorted_list_to_bst.tsv")
   public static void buildBSTFromSortedListWrapper(TestTimer timer,
-                                                   List<Integer> L)
+                                                   List<Integer> values)
       throws TestFailureException {
     DoublyListNode<Integer> list = null;
-    for (int i = L.size() - 1; i >= 0; i--) {
-      list = new DoublyListNode<>(L.get(i), null, list);
+    for (int i = values.size() - 1; i >= 0; i--) {
+      list = new DoublyListNode<>(values.get(i), null, list);
 
       if (list.next != null) {
         list.next.prev = list;
@@ -52,13 +52,13 @@ public class SortedListToBst {
     }
 
     timer.start();
-    list = buildBSTFromSortedList(list, L.size());
+    list = buildBSTFromSortedList(list, values.size());
     timer.stop();
 
-    Iterator<Integer> current = L.iterator();
+    Iterator<Integer> current = values.iterator();
     compareVectorAndTree(list, current);
     if (current.hasNext()) {
-      throw new TestFailureException("Too many L in the tree");
+      throw new TestFailureException("Too many values in the tree");
     }
   }
 

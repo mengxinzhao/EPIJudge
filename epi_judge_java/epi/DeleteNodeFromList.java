@@ -13,13 +13,12 @@ public class DeleteNodeFromList {
   }
 
   @EpiTest(testfile = "delete_node_from_list.tsv")
-  public static ListNode<Integer> deleteListWrapper(TestTimer timer,
-                                                    ListNode<Integer> head,
-                                                    int nodeToDeleteIdx) {
+  public static ListNode<Integer>
+  deleteListWrapper(TestTimer timer, ListNode<Integer> head, int i) {
     ListNode<Integer> nodeToDelete = head;
     if (nodeToDelete == null)
       throw new RuntimeException("List is empty");
-    while (nodeToDeleteIdx-- > 0) {
+    while (i-- > 0) {
       if (nodeToDelete.next == null)
         throw new RuntimeException("Can't delete last node");
       nodeToDelete = nodeToDelete.next;

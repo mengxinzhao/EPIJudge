@@ -24,7 +24,8 @@ public class TestUtils {
     try {
       inputData = Files.lines(dataFile);
     } catch (IOException e) {
-      throw new RuntimeException("Test data file not found");
+      e.printStackTrace();
+      System.exit(-1);
     }
     List<String> asList =
         inputData.collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
@@ -40,16 +41,12 @@ public class TestUtils {
     List<List<String>> testData = splitTsvFile(testDataPath);
     handler.parseSignature(testData.get(0));
 
-    List<String> paramNames = handler.paramNames();
-
-    int firstTestIdx = 1;
     int testNr = 0;
-    final int totalTests = testData.size() - firstTestIdx;
+    final int totalTests = testData.size() - 1;
     int testsPassed = 0;
     List<Long> durations = new ArrayList<>();
 
-    for (List<String> testCase :
-         testData.subList(firstTestIdx, testData.size())) {
+    for (List<String> testCase : testData.subList(1, testData.size())) {
       testNr++;
 
       // Since the last field of test_data is test_explanation, which is not
@@ -119,8 +116,8 @@ public class TestUtils {
         }
       }
 
-      TestUtilsConsole.printTestInfo(result, testNr, totalTests, diagnostic,
-                                     testOutput.timer);
+      TestUtilsConsole.printTestResult(result, testNr, totalTests, diagnostic,
+                                       testOutput.timer);
 
       if (result == TestResult.PASSED) {
         testsPassed++;
@@ -134,8 +131,7 @@ public class TestUtils {
         if (!handler.expectedIsVoid()) {
           testCase = testCase.subList(0, testCase.size() - 1);
         }
-        TestUtilsConsole.printFailedTest(paramNames, testCase, testOutput,
-                                         testExplanation);
+        TestUtilsConsole.printFailedTest(testCase, testOutput, testExplanation);
         break;
       }
     }
@@ -150,7 +146,7 @@ public class TestUtils {
                 durationsSize));
 
         Collections.sort(durations);
-        System.out.println("Median running time:  " +
+        System.out.println("Median running time: " +
                            TestTimer.durationToString(
                                (durationsSize % 2 == 1)
                                    ? durations.get(durationsSize / 2)

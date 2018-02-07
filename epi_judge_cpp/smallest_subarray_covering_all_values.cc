@@ -50,8 +50,7 @@ int FindSmallestSequentiallyCoveringSubsetWrapper(
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"timer", "paragraph", "keywords"};
-  generic_test_main(argc, argv, param_names, "subsequence_cover.tsv",
+  generic_test_main(argc, argv, "subsequence_cover.tsv",
                     &FindSmallestSequentiallyCoveringSubsetWrapper);
   return 0;
 }

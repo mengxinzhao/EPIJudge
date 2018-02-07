@@ -10,8 +10,7 @@ int FindElementAppearsOnce(const vector<int>& A) {
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"A"};
-  generic_test_main(argc, argv, param_names, "element_appearing_once.tsv",
+  generic_test_main(argc, argv, "element_appearing_once.tsv",
                     &FindElementAppearsOnce);
   return 0;
 }

@@ -16,11 +16,9 @@
 #include <unistd.h>
 #endif
 
-namespace platform {
+namespace os {
 
-bool ENABLE_COLOR_OUTPUT = true;
-
-int StdOutFd() {
+inline int StdOutFd() {
 #ifdef _WINDOWS
   return _fileno(stdout);
 #else
@@ -28,22 +26,15 @@ int StdOutFd() {
 #endif
 }
 
-int IsATty(int fd) {
+inline int IsATty(int fd) {
 #ifdef _WINDOWS
-  return _isatty(fd);
+  return ::_isatty(fd);
 #else
-  return isatty(fd);
+  return ::isatty(fd);
 #endif
 }
 
-bool UseTtyOutput() {
-  static int cached = IsATty(StdOutFd());
-  return static_cast<bool>(cached);
-}
-
-bool UseColorOutput() { return UseTtyOutput() && ENABLE_COLOR_OUTPUT; }
-
-bool IsDir(const char* path) {
+inline bool IsDir(const char* path) {
 #ifdef _WINDOWS
   struct _stat buf {};
   _stat(path, &buf);
@@ -55,7 +46,7 @@ bool IsDir(const char* path) {
 #endif
 }
 
-char PathSep() {
+inline char PathSep() {
 #ifdef _WINDOWS
   return '\\';
 #else
@@ -63,4 +54,4 @@ char PathSep() {
 #endif
 }
 
-}  // namespace platform
+}  // namespace os

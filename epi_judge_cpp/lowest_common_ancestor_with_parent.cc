@@ -5,17 +5,17 @@
 #include "test_framework/test_timer.h"
 
 #include <stack>
-BinaryTreeNode<int>* LCA(const unique_ptr<BinaryTreeNode<int>>& node0,
-                         const unique_ptr<BinaryTreeNode<int>>& node1) {
+BinaryTreeNode<int>* LCA(const unique_ptr<BinaryTreeNode<int>>& node_0,
+                         const unique_ptr<BinaryTreeNode<int>>& node_1) {
   // Implement this placeholder.
 	// track back from parents pointer to the root.the fist common node from the top is common ancester
 	std::stack< BinaryTreeNode<int> *> path0, path1;
-	BinaryTreeNode<int> * p = node0.get();
+	BinaryTreeNode<int> * p = node_0.get();
 	while (p) {
 		path0.push(p);
 		p = p->parent;
 	}
-	p = node1.get();
+	p = node_1.get();
 	while (p) {
 		path1.push(p);
 		p = p->parent;
@@ -33,11 +33,13 @@ BinaryTreeNode<int>* LCA(const unique_ptr<BinaryTreeNode<int>>& node0,
   return p;
 }
 
-int LcaWrapper(TestTimer& timer, const unique_ptr<BinaryTreeNode<int>>& tree,
-               int node0, int node1) {
+int LcaWrapper(TestTimer& timer, const unique_ptr<BinaryTreeNode<int>>& root,
+               int key1, int key2) {
+  auto& node1 = MustFindNode(root, key1);
+  auto& node2 = MustFindNode(root, key2);
+
   timer.Start();
-  BinaryTreeNode<int>* result =
-      LCA(MustFindNode(tree, node0), MustFindNode(tree, node1));
+  auto result = LCA(node1, node2);
   timer.Stop();
 
   if (!result) {
@@ -49,8 +51,6 @@ int LcaWrapper(TestTimer& timer, const unique_ptr<BinaryTreeNode<int>>& tree,
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"timer", "tree", "node0", "node1"};
-  generic_test_main(argc, argv, param_names, "lowest_common_ancestor.tsv",
-                    &LcaWrapper);
+  generic_test_main(argc, argv, "lowest_common_ancestor.tsv", &LcaWrapper);
   return 0;
 }

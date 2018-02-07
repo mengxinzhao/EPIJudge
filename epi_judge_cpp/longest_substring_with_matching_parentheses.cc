@@ -12,8 +12,7 @@ int LongestMatchingParentheses(const string& s) {
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"s"};
-  generic_test_main(argc, argv, param_names,
+  generic_test_main(argc, argv,
                     "longest_substring_with_matching_parentheses.tsv",
                     &LongestMatchingParentheses);
   return 0;

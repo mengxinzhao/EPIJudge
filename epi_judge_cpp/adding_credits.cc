@@ -74,8 +74,7 @@ void ClientsCreditsInfoTester(const std::vector<Operation>& ops) {
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"ops"};
-  generic_test_main(argc, argv, param_names, "adding_credits.tsv",
+  generic_test_main(argc, argv, "adding_credits.tsv",
                     &ClientsCreditsInfoTester);
   return 0;
 }

@@ -1,4 +1,4 @@
-from bst_node import BstNode
+from bst_node import BSTNode
 
 
 def merge_two_bsts(A, B):

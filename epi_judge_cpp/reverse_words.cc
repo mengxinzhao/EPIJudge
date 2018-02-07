@@ -2,8 +2,6 @@
 #include <algorithm>
 #include <iostream>
 
-#include "test_framework/test_timer.h"
-
 using std::string;
 
 void ReverseWords(string* s) {
@@ -30,19 +28,14 @@ void ReverseWords(string* s) {
   return;
 }
 
-string ReverseWordsWrapper(TestTimer& timer, string s) {
-  string s_copy = s;
-  timer.Start();
-  ReverseWords(&s_copy);
-  timer.Stop();
-  return s_copy;
+string ReverseWordsWrapper(string s) {
+  ReverseWords(&s);
+  return s;
 }
 
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"timer", "s"};
-  generic_test_main(argc, argv, param_names, "reverse_words.tsv",
-                    &ReverseWordsWrapper);
+  generic_test_main(argc, argv, "reverse_words.tsv", &ReverseWordsWrapper);
   return 0;
 }

@@ -10,20 +10,20 @@ def find_smallest_subarray_covering_set(paragraph, keywords):
 
 
 @enable_timer_hook
-def find_smallest_subarray_covering_set_wrapper(timer, paragraph, keywords):
-    copy = keywords
+def find_smallest_subarray_covering_set_wrapper(timer, v, s):
+    copy = s
 
     timer.start()
-    (start, end) = find_smallest_subarray_covering_set(paragraph, keywords)
+    (start, end) = find_smallest_subarray_covering_set(v, s)
     timer.stop()
 
-    if start < 0 or start >= len(paragraph) or \
-                    end < 0 or end >= len(paragraph) or \
+    if start < 0 or start >= len(v) or \
+                    end < 0 or end >= len(v) or \
                     start > end:
         raise TestFailureException("Index out of range")
 
     for i in range(start, end + 1):
-        copy.discard(paragraph[i])
+        copy.discard(v[i])
 
     if copy:
         raise TestFailureException("Not all keywords are in the range")

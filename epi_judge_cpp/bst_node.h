@@ -9,16 +9,16 @@
 using std::unique_ptr;
 
 template <typename T>
-struct BstNode {
+struct BSTNode {
   T data;
-  unique_ptr<BstNode<T>> left, right;
+  unique_ptr<BSTNode<T>> left, right;
 
-  explicit BstNode(const T& data) : data(data) {}
+  explicit BSTNode(const T& data) : data(data) {}
 
-  BstNode(T data, unique_ptr<BstNode<T>> left, unique_ptr<BstNode<T>> right)
+  BSTNode(T data, unique_ptr<BSTNode<T>> left, unique_ptr<BSTNode<T>> right)
       : data(data), left(std::move(left)), right(std::move(right)) {}
 };
 
 template <typename KeyT>
-struct SerializationTraits<std::unique_ptr<BstNode<KeyT>>>
-    : BinaryTreeSerializationTraits<std::unique_ptr<BstNode<KeyT>>, false> {};
+struct SerializationTraits<std::unique_ptr<BSTNode<KeyT>>>
+    : BinaryTreeSerializationTraits<std::unique_ptr<BSTNode<KeyT>>, false> {};

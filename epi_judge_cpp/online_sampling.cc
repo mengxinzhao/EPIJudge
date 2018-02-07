@@ -37,20 +37,18 @@ vector<int> OnlineRandomSample(vector<int>::const_iterator stream_begin,
   return v;
 }
 
-bool OnlineRandomSamplingRunner(TestTimer& timer, vector<int> stream, int k) {
+bool OnlineRandomSamplingRunner(TestTimer& timer, vector<int> A, int k) {
   vector<vector<int>> results;
   timer.Start();
-  std::generate_n(
-      back_inserter(results), 100000,
-      std::bind(OnlineRandomSample, cbegin(stream), cend(stream), k));
+  std::generate_n(back_inserter(results), 100000,
+                  std::bind(OnlineRandomSample, cbegin(A), cend(A), k));
   timer.Stop();
 
-  int total_possible_outcomes = BinomialCoefficient(stream.size(), k);
-  sort(begin(stream), end(stream));
+  int total_possible_outcomes = BinomialCoefficient(A.size(), k);
+  sort(begin(A), end(A));
   vector<vector<int>> combinations;
-  for (int i = 0; i < BinomialCoefficient(stream.size(), k); ++i) {
-    combinations.emplace_back(
-        ComputeCombinationIdx(stream, stream.size(), k, i));
+  for (int i = 0; i < BinomialCoefficient(A.size(), k); ++i) {
+    combinations.emplace_back(ComputeCombinationIdx(A, A.size(), k, i));
   }
   vector<int> sequence;
   for (vector<int> result : results) {
@@ -63,17 +61,15 @@ bool OnlineRandomSamplingRunner(TestTimer& timer, vector<int> stream, int k) {
                                         0.01);
 }
 
-void OnlineRandomSampleWrapper(TestTimer& timer, const vector<int>& stream,
-                               int k) {
+void OnlineRandomSampleWrapper(TestTimer& timer, const vector<int>& A, int k) {
   RunFuncWithRetries(
-      bind(OnlineRandomSamplingRunner, std::ref(timer), std::cref(stream), k));
+      bind(OnlineRandomSamplingRunner, std::ref(timer), std::cref(A), k));
 }
 
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"timer", "stream", "k"};
-  generic_test_main(argc, argv, param_names, "online_sampling.tsv",
+  generic_test_main(argc, argv, "online_sampling.tsv",
                     &OnlineRandomSampleWrapper);
   return 0;
 }

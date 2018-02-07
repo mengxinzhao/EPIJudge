@@ -28,7 +28,6 @@ std::ostream& operator<<(std::ostream& out, const Interval& i) {
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"disjoint_intervals", "new_interval"};
-  generic_test_main(argc, argv, param_names, "interval_add.tsv", &AddInterval);
+  generic_test_main(argc, argv, "interval_add.tsv", &AddInterval);
   return 0;
 }

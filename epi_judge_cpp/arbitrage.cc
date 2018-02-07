@@ -2,7 +2,7 @@
 
 using std::vector;
 
-bool IsArbitrageExist(vector<vector<double>> graph) {
+bool IsArbitrageExist(vector<vector<double>> G) {
   // Implement this placeholder.
   return true;
 }
@@ -10,8 +10,6 @@ bool IsArbitrageExist(vector<vector<double>> graph) {
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"graph"};
-  generic_test_main(argc, argv, param_names, "arbitrage.tsv",
-                    &IsArbitrageExist);
+  generic_test_main(argc, argv, "arbitrage.tsv", &IsArbitrageExist);
   return 0;
 }

@@ -11,10 +11,10 @@ def string_to_int(s):
     return 0
 
 
-def wrapper(x, s):
-    if int_to_string(x) != s:
+def wrapper(num, s):
+    if int_to_string(num) != s:
         raise TestFailureException("Int to string conversion failed")
-    if string_to_int(s) != x:
+    if string_to_int(s) != num:
         raise TestFailureException("String to int conversion failed")
 
 

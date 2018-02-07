@@ -22,7 +22,7 @@ public class DeadlockDetection {
     }
   }
 
-  public static boolean isDeadlocked(List<GraphVertex> graph) {
+  public static boolean isDeadlocked(List<GraphVertex> G) {
     // Implement this placeholder.
     return true;
   }
@@ -39,17 +39,17 @@ public class DeadlockDetection {
   }
 
   @EpiTest(testfile = "deadlock_detection.tsv")
-  public static boolean isDeadlockedWrapper(TestTimer timer, int numNodes,
+  public static boolean isDeadlockedWrapper(TestTimer timer, int k,
                                             List<Edge> edges) {
-    if (numNodes <= 0) {
-      throw new RuntimeException("Invalid numNodes value");
+    if (k <= 0) {
+      throw new RuntimeException("Invalid k value");
     }
     List<GraphVertex> graph = new ArrayList<>();
-    for (int i = 0; i < numNodes; i++) {
+    for (int i = 0; i < k; i++) {
       graph.add(new GraphVertex());
     }
     for (Edge e : edges) {
-      if (e.from < 0 || e.from >= numNodes || e.to < 0 || e.to >= numNodes) {
+      if (e.from < 0 || e.from >= k || e.to < 0 || e.to >= k) {
         throw new RuntimeException("Invalid vertex index");
       }
       graph.get(e.from).edges.add(graph.get(e.to));

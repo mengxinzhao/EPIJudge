@@ -36,8 +36,7 @@ vector<int> CreateListOfLeavesWrapper(
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"timer", "tree"};
-  generic_test_main(argc, argv, param_names, "tree_connect_leaves.tsv",
+  generic_test_main(argc, argv, "tree_connect_leaves.tsv",
                     &CreateListOfLeavesWrapper);
   return 0;
 }

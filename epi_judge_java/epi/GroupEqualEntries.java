@@ -51,34 +51,34 @@ public class GroupEqualEntries {
     return;
   }
 
-  private static Map<Person, Integer> buildMultiset(List<Person> people) {
+  private static Map<Person, Integer> buildMultiset(List<Person> data) {
     Map<Person, Integer> m = new HashMap<>();
-    for (Person p : people) {
+    for (Person p : data) {
       m.put(p, m.getOrDefault(p, 0) + 1);
     }
     return m;
   }
 
   @EpiTest(testfile = "group_equal_entries.tsv")
-  public static void groupByAgeWrapper(TestTimer timer, List<Person> people)
+  public static void groupByAgeWrapper(TestTimer timer, List<Person> data)
       throws TestFailureException {
-    if (people.isEmpty()) {
+    if (data.isEmpty()) {
       return;
     }
-    Map<Person, Integer> values = buildMultiset(people);
+    Map<Person, Integer> values = buildMultiset(data);
 
     timer.start();
-    groupByAge(people);
+    groupByAge(data);
     timer.stop();
 
-    Map<Person, Integer> newValues = buildMultiset(people);
+    Map<Person, Integer> newValues = buildMultiset(data);
     if (!values.equals(newValues)) {
       throw new TestFailureException("Entry set changed");
     }
-    int lastAge = people.get(0).age;
+    int lastAge = data.get(0).age;
     Set<Integer> ages = new HashSet<>();
 
-    for (Person p : people) {
+    for (Person p : data) {
       if (ages.contains(p.age)) {
         throw new TestFailureException("Entries are not grouped by age");
       }

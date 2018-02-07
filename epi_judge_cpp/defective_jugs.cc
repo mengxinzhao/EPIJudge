@@ -23,8 +23,6 @@ bool operator==(const Jug& lhs, const Jug& rhs) {
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"jugs", "L", "H"};
-  generic_test_main(argc, argv, param_names, "defective_jugs.tsv",
-                    &CheckFeasible);
+  generic_test_main(argc, argv, "defective_jugs.tsv", &CheckFeasible);
   return 0;
 }

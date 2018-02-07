@@ -9,7 +9,7 @@
 
 using std::shared_ptr;
 
-shared_ptr<ListNode<int>> ListPivoting(const shared_ptr<ListNode<int>>& l,
+shared_ptr<ListNode<int>> ListPivoting(const shared_ptr<ListNode<int>>& L,
                                        int x) {
   // Implement this placeholder.
   return nullptr;
@@ -29,9 +29,9 @@ void ListPivotingWrapper(TestTimer& timer, const shared_ptr<ListNode<int>>& l,
                          int x) {
   std::vector<int> original = ListToVector(l);
   timer.Start();
-  std::shared_ptr<ListNode<int>> pivoted_list = ListPivoting(l, x);
+  auto pivoted_list = ListPivoting(l, x);
   timer.Stop();
-  vector<int> pivoted = ListToVector(pivoted_list);
+  auto pivoted = ListToVector(pivoted_list);
   enum { LESS, EQ, GREATER } mode = LESS;
   for (auto& i : pivoted) {
     switch (mode) {
@@ -65,8 +65,6 @@ void ListPivotingWrapper(TestTimer& timer, const shared_ptr<ListNode<int>>& l,
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"timer", "l", "x"};
-  generic_test_main(argc, argv, param_names, "pivot_list.tsv",
-                    &ListPivotingWrapper);
+  generic_test_main(argc, argv, "pivot_list.tsv", &ListPivotingWrapper);
   return 0;
 }

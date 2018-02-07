@@ -11,7 +11,7 @@ struct GraphVertex {
   vector<GraphVertex*> edges;
 };
 
-bool IsDeadlocked(vector<GraphVertex>* graph) {
+bool IsDeadlocked(vector<GraphVertex>* G) {
   // Implement this placeholder.
   return true;
 }
@@ -24,20 +24,19 @@ struct Edge {
 template <>
 struct SerializationTraits<Edge> : UserSerTraits<Edge, int, int> {};
 
-bool HasCycleWrapper(TestTimer& timer, int num_nodes,
-                     const vector<Edge>& edges) {
+bool HasCycleWrapper(TestTimer& timer, int k, const vector<Edge>& edges) {
   vector<GraphVertex> graph;
-  if (num_nodes <= 0) {
-    throw std::runtime_error("Invalid num_nodes value");
+  if (k <= 0) {
+    throw std::runtime_error("Invalid k value");
   }
-  graph.reserve(num_nodes);
+  graph.reserve(k);
 
-  for (int i = 0; i < num_nodes; i++) {
+  for (int i = 0; i < k; i++) {
     graph.push_back(GraphVertex{});
   }
 
   for (const Edge& e : edges) {
-    if (e.from < 0 || e.from >= num_nodes || e.to < 0 || e.to >= num_nodes) {
+    if (e.from < 0 || e.from >= k || e.to < 0 || e.to >= k) {
       throw std::runtime_error("Invalid vertex index");
     }
     graph[e.from].edges.push_back(&graph[e.to]);
@@ -52,8 +51,6 @@ bool HasCycleWrapper(TestTimer& timer, int num_nodes,
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"timer", "num_nodes", "edges"};
-  generic_test_main(argc, argv, param_names, "deadlock_detection.tsv",
-                    &HasCycleWrapper);
+  generic_test_main(argc, argv, "deadlock_detection.tsv", &HasCycleWrapper);
   return 0;
 }

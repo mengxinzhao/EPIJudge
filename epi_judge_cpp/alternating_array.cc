@@ -11,7 +11,7 @@ void Rearrange(vector<int>* A_ptr) {
 }
 
 void CheckAnswer(const vector<int>& A) {
-  for (int i = 0; i < A.size(); ++i) {
+  for (size_t i = 0; i < A.size(); ++i) {
     if (i % 2) {
       if (A[i] < A[i - 1]) {
         throw TestFailureException("");
@@ -36,19 +36,17 @@ void CheckAnswer(const vector<int>& A) {
   }
 }
 
-void RearrangeWrapper(TestTimer& timer, vector<int> A) {
+void RearrangeWrapper(TestTimer& timer, vector<int> v) {
   timer.Start();
-  Rearrange(&A);
+  Rearrange(&v);
   timer.Stop();
 
-  CheckAnswer(A);
+  CheckAnswer(v);
 }
 
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"timer", "A"};
-  generic_test_main(argc, argv, param_names, "alternating_array.tsv",
-                    &RearrangeWrapper);
+  generic_test_main(argc, argv, "alternating_array.tsv", &RearrangeWrapper);
   return 0;
 }

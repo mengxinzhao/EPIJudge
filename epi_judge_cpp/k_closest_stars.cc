@@ -17,8 +17,8 @@ struct Star {
   double x, y, z;
 };
 
-vector<Star> FindClosestKStars(vector<Star>::const_iterator stars_begin,
-                               const vector<Star>::const_iterator& stars_end,
+vector<Star> FindClosestKStars(vector<Star>::const_iterator star_begin,
+                               const vector<Star>::const_iterator& star_end,
                                int k) {
   // Implement this placeholder.
   return {};
@@ -54,8 +54,7 @@ vector<Star> FindClosestKStarsWrapper(const vector<Star>& stars, int k) {
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"stars", "k"};
-  generic_test_main(argc, argv, param_names, "k_closest_stars.tsv",
+  generic_test_main(argc, argv, "k_closest_stars.tsv",
                     &FindClosestKStarsWrapper, &Comp);
   return 0;
 }

@@ -9,14 +9,14 @@ def reverse_words(s):
 
 @enable_timer_hook
 def reverse_words_wrapper(timer, s):
-    s_copy = bytearray()
-    s_copy.extend(map(ord, s))
+    output = bytearray()
+    output.extend(map(ord, s))
 
     timer.start()
-    reverse_words(s_copy)
+    reverse_words(output)
     timer.stop()
 
-    return s_copy.decode("utf-8")
+    return output.decode("utf-8")
 
 
 from test_framework import test_utils_generic_main, test_utils

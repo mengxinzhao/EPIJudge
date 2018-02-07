@@ -81,10 +81,13 @@ BinaryTreeNode<int>* LCA(const unique_ptr<BinaryTreeNode<int>>& tree,
 
 }
 
-int LcaWrapper(TestTimer& timer, const unique_ptr<BinaryTreeNode<int>>& tree,
-               int node0, int node1) {
+int LcaWrapper(TestTimer& timer, const unique_ptr<BinaryTreeNode<int>>& root,
+               int key1, int key2) {
+  auto& node1 = MustFindNode(root, key1);
+  auto& node2 = MustFindNode(root, key2);
+
   timer.Start();
-  auto result = LCA(tree, MustFindNode(tree, node0), MustFindNode(tree, node1));
+  auto result = LCA(root, node1, node2);
   timer.Stop();
 
   if (!result) {
@@ -96,8 +99,6 @@ int LcaWrapper(TestTimer& timer, const unique_ptr<BinaryTreeNode<int>>& tree,
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"timer", "tree", "node0", "node1"};
-  generic_test_main(argc, argv, param_names, "lowest_common_ancestor.tsv",
-                    &LcaWrapper);
+  generic_test_main(argc, argv, "lowest_common_ancestor.tsv", &LcaWrapper);
   return 0;
 }

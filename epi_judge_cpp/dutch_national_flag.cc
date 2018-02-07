@@ -42,14 +42,14 @@ void DutchFlagPartition(int pivot_index, vector<Color>* A_ptr) {
   return;
 }
 
-void DutchFlagPartitionWrapper(TestTimer& timer, const vector<int>& A,
+void DutchFlagPartitionWrapper(TestTimer& timer, const vector<int>& data,
                                int pivot_idx) {
   vector<Color> colors;
-  colors.resize(A.size());
+  colors.resize(data.size());
   std::array<int, 3> count = {0, 0, 0};
-  for (size_t i = 0; i < A.size(); i++) {
-    count[A[i]]++;
-    colors[i] = static_cast<Color>(A[i]);
+  for (size_t i = 0; i < data.size(); i++) {
+    count[data[i]]++;
+    colors[i] = static_cast<Color>(data[i]);
   }
   Color pivot = colors[pivot_idx];
 
@@ -81,8 +81,7 @@ void DutchFlagPartitionWrapper(TestTimer& timer, const vector<int>& A,
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"timer", "A", "pivot_idx"};
-  generic_test_main(argc, argv, param_names, "dutch_national_flag.tsv",
+  generic_test_main(argc, argv, "dutch_national_flag.tsv",
                     &DutchFlagPartitionWrapper);
   return 0;
 }

@@ -11,15 +11,18 @@ import java.util.stream.Collectors;
 public class IsArrayDominated {
   @EpiTest(testfile = "is_array_dominated.tsv")
   public static void
-  validPlacementExistsWrapper(TestTimer timer, List<Integer> team0,
-                              List<Integer> team1, boolean expected01,
-                              boolean expected10) throws TestFailureException {
-    Team t0 = new Team(team0);
-    Team t1 = new Team(team1);
+  validPlacementExistsWrapper(TestTimer timer, List<Integer> h1,
+                              List<Integer> h2, boolean expected12,
+                              boolean expected21) throws TestFailureException {
+    Team t1 = new Team(h1);
+    Team t2 = new Team(h2);
 
     timer.start();
-    if (Team.validPlacementExists(t0, t1) != expected01 ||
-        Team.validPlacementExists(t1, t0) != expected10) {
+    boolean result12 = Team.validPlacementExists(t1, t2);
+    boolean result21 = Team.validPlacementExists(t2, t1);
+    timer.stop();
+
+    if (result12 != expected12 || result21 != expected21) {
       throw new TestFailureException("");
     }
   }
@@ -47,8 +50,8 @@ class Team {
         height.stream().map(h -> new Player(h)).collect(Collectors.toList());
   }
 
-  // Checks if team0 can be placed in front of team1.
-  public static boolean validPlacementExists(Team team0, Team team1) {
+  // Checks if A can be placed in front of B.
+  public static boolean validPlacementExists(Team A, Team B) {
     // Implement this placeholder.
     return true;
   }

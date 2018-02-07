@@ -14,7 +14,7 @@ import java.util.List;
 public class OnlineSampling {
 
   // Assumption: there are at least k elements in the stream.
-  public static List<Integer> onlineRandomSample(Iterator<Integer> stream,
+  public static List<Integer> onlineRandomSample(Iterator<Integer> sequence,
                                                  int k) {
     // Implement this placeholder.
     return null;
@@ -48,11 +48,11 @@ public class OnlineSampling {
   }
 
   @EpiTest(testfile = "online_sampling.tsv")
-  public static void onlineRandomSampleWrapper(TestTimer timer,
-                                               List<Integer> stream, int k)
+  public static void onlineRandomSampleWrapper(TestTimer timer, List<Integer> A,
+                                               int k)
       throws TestFailureException {
     RandomSequenceChecker.runFuncWithRetries(
-        () -> onlineRandomSampleRunner(timer, stream, k));
+        () -> onlineRandomSampleRunner(timer, A, k));
   }
 
   public static void main(String[] args) {

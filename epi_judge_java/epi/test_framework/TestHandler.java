@@ -8,6 +8,4 @@ public interface TestHandler {
   TestOutput runTest(List<String> arguments) throws Exception;
 
   boolean expectedIsVoid();
-
-  List<String> paramNames();
 }

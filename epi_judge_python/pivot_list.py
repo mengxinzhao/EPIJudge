@@ -3,28 +3,28 @@ from test_framework.test_failure_exception import TestFailureException
 from test_framework.test_utils import enable_timer_hook
 
 
-def list_pivoting(l, x):
+def list_pivoting(L, x):
     # Implement this placeholder.
     return None
 
 
-def linked_to_list(l):
-    v = list()
-    while l is not None:
-        v.append(l.data)
-        l = l.next
-    return v
+def linked_to_list(ll):
+    l = list()
+    while ll is not None:
+        l.append(ll.data)
+        ll = ll.next
+    return l
 
 
 @enable_timer_hook
-def list_pivoting_wrapper(timer, l, x):
-    original = linked_to_list(l)
+def list_pivoting_wrapper(timer, ll, x):
+    original = linked_to_list(ll)
 
     timer.start()
-    l = list_pivoting(l, x)
+    ll = list_pivoting(ll, x)
     timer.stop()
 
-    pivoted = linked_to_list(l)
+    pivoted = linked_to_list(ll)
     mode = -1
     for i in pivoted:
         if mode == -1:

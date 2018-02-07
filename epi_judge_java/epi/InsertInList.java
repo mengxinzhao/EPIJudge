@@ -15,20 +15,19 @@ public class InsertInList {
 
   @EpiTest(testfile = "insert_in_list.tsv")
   public static ListNode<Integer>
-  insertListWrapper(TestTimer timer, ListNode<Integer> l, int nodeIdx,
-                    int newNodeData) {
-    ListNode<Integer> node = l;
-    while (nodeIdx > 1) {
+  insertListWrapper(TestTimer timer, ListNode<Integer> L, int pos, int key) {
+    ListNode<Integer> node = L;
+    while (pos > 1) {
       node = node.next;
-      --nodeIdx;
+      --pos;
     }
-    ListNode<Integer> newNode = new ListNode<Integer>(newNodeData, null);
+    ListNode<Integer> newNode = new ListNode<Integer>(key, null);
 
     timer.start();
     insertAfter(node, newNode);
     timer.stop();
 
-    return l;
+    return L;
   }
 
   public static void main(String[] args) {

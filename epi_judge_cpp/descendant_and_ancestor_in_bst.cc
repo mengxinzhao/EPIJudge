@@ -7,22 +7,22 @@
 using std::unique_ptr;
 
 bool PairIncludesAncestorAndDescendantOfM(
-    const unique_ptr<BstNode<int>>& possible_anc_or_desc_0,
-    const unique_ptr<BstNode<int>>& possible_anc_or_desc_1,
-    const unique_ptr<BstNode<int>>& middle) {
+    const unique_ptr<BSTNode<int>>& possible_anc_or_desc_0,
+    const unique_ptr<BSTNode<int>>& possible_anc_or_desc_1,
+    const unique_ptr<BSTNode<int>>& middle) {
   // Implement this placeholder.
   return true;
 }
 
 bool PairIncludesAncestorAndDescendantOfMWrapper(
-    TestTimer& timer, const unique_ptr<BstNode<int>>& tree,
-    int possible_anc_or_desc_0, int possible_anc_or_desc_1, int middle) {
-  auto& candidate0 = MustFindNode(tree, possible_anc_or_desc_0);
-  auto& candidate1 = MustFindNode(tree, possible_anc_or_desc_1);
-  auto& middle_node = MustFindNode(tree, middle);
+    TestTimer& timer, const unique_ptr<BSTNode<int>>& tree, int candidate1idx,
+    int candidate2idx, int middle_idx) {
+  auto& candidate1 = MustFindNode(tree, candidate1idx);
+  auto& candidate2 = MustFindNode(tree, candidate2idx);
+  auto& middle = MustFindNode(tree, middle_idx);
   timer.Start();
   bool result =
-      PairIncludesAncestorAndDescendantOfM(candidate0, candidate1, middle_node);
+      PairIncludesAncestorAndDescendantOfM(candidate1, candidate2, middle);
   timer.Stop();
   return result;
 }
@@ -30,11 +30,7 @@ bool PairIncludesAncestorAndDescendantOfMWrapper(
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"timer", "tree",
-                                       "possible_anc_or_desc_0",
-                                       "possible_anc_or_desc_1", "middle"};
-  generic_test_main(argc, argv, param_names,
-                    "descendant_and_ancestor_in_bst.tsv",
+  generic_test_main(argc, argv, "descendant_and_ancestor_in_bst.tsv",
                     &PairIncludesAncestorAndDescendantOfMWrapper);
   return 0;
 }

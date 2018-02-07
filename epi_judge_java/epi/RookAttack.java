@@ -3,7 +3,6 @@ package epi;
 import epi.test_framework.EpiTest;
 import epi.test_framework.GenericTestHandler;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RookAttack {
@@ -15,9 +14,8 @@ public class RookAttack {
 
   @EpiTest(testfile = "rook_attack.tsv")
   public static List<List<Integer>> rookAttackWrapper(List<List<Integer>> A) {
-    List<List<Integer>> aCopy = new ArrayList<>(A);
-    rookAttack(aCopy);
-    return aCopy;
+    rookAttack(A);
+    return A;
   }
 
   public static void main(String[] args) {

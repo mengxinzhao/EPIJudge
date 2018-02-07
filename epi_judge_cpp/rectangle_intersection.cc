@@ -46,8 +46,7 @@ std::ostream& operator<<(std::ostream& out, const Rectangle& r) {
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"R1", "R2"};
-  generic_test_main(argc, argv, param_names, "rectangle_intersection.tsv",
+  generic_test_main(argc, argv, "rectangle_intersection.tsv",
                     &IntersectRectangle);
   return 0;
 }

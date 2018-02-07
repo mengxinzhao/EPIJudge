@@ -7,14 +7,14 @@
 
 using std::shared_ptr;
 
-shared_ptr<BstNode<int>> BSTToDoublyLinkedList(
-    const shared_ptr<BstNode<int>>& tree) {
+shared_ptr<BSTNode<int>> BSTToDoublyLinkedList(
+    const shared_ptr<BSTNode<int>>& tree) {
   // Implement this placeholder.
   return nullptr;
 }
 
 std::vector<int> BSTToDoublyLinkedListWrapper(
-    TestTimer& timer, const std::shared_ptr<BstNode<int>>& tree) {
+    TestTimer& timer, const std::shared_ptr<BSTNode<int>>& tree) {
   timer.Start();
   auto list = BSTToDoublyLinkedList(tree);
   timer.Stop();
@@ -36,8 +36,7 @@ std::vector<int> BSTToDoublyLinkedListWrapper(
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"timer", "tree"};
-  generic_test_main(argc, argv, param_names, "bst_to_sorted_list.tsv",
+  generic_test_main(argc, argv, "bst_to_sorted_list.tsv",
                     &BSTToDoublyLinkedListWrapper);
   return 0;
 }

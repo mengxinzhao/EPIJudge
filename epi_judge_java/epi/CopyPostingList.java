@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class CopyPostingList {
 
-  public static PostingListNode copyPostingsList(PostingListNode l) {
+  public static PostingListNode copyPostingsList(PostingListNode L) {
     // Implement this placeholder.
     return null;
   }
@@ -99,10 +99,10 @@ public class CopyPostingList {
   }
 
   @EpiTest(testfile = "copy_posting_list.tsv")
-  public static void copyPostingsListWrapper(TestTimer timer,
-                                             List<SerializedNode> l)
+  public static void
+  copyPostingsListWrapper(TestTimer timer, List<SerializedNode> serializedNodes)
       throws TestFailureException {
-    PostingListNode head = createPostingList(l);
+    PostingListNode head = createPostingList(serializedNodes);
 
     timer.start();
     PostingListNode copy = copyPostingsList(head);

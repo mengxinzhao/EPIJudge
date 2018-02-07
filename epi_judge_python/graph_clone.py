@@ -7,7 +7,7 @@ class GraphVertex:
         self.edges = []
 
 
-def clone_graph(graph):
+def clone_graph(G):
     # Implement this placeholder.
     return None
 
@@ -16,7 +16,7 @@ def copy_labels(edges):
     return [e.label for e in edges]
 
 
-def check_graph(node, graph):
+def check_graph(node, G):
     from test_framework.test_failure_exception import TestFailureException
     vertex_set = set()
     q = collections.deque()
@@ -24,10 +24,10 @@ def check_graph(node, graph):
     vertex_set.add(node)
     while q:
         vertex = q.popleft()
-        if vertex.label >= len(graph):
+        if vertex.label >= len(G):
             raise TestFailureException('')
         label1 = copy_labels(vertex.edges)
-        label2 = copy_labels(graph[vertex.label].edges)
+        label2 = copy_labels(G[vertex.label].edges)
         label1.sort()
         label2.sort()
         if label1 != label2:

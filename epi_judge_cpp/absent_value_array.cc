@@ -12,9 +12,9 @@ int FindMissingElement(vector<int>::const_iterator stream_begin,
   return 0;
 }
 
-int FindMissingElementWrapper(const vector<int>& stream) {
+int FindMissingElementWrapper(const vector<int>& data) {
   try {
-    return FindMissingElement(cbegin(stream), cend(stream));
+    return FindMissingElement(cbegin(data), cend(data));
   } catch (invalid_argument&) {
     throw TestFailureException("Unexpected no_missing_element exception");
   }
@@ -23,8 +23,7 @@ int FindMissingElementWrapper(const vector<int>& stream) {
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"stream"};
-  generic_test_main(argc, argv, param_names, "absent_value_array.tsv",
+  generic_test_main(argc, argv, "absent_value_array.tsv",
                     &FindMissingElementWrapper);
   return 0;
 }

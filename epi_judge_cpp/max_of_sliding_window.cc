@@ -30,8 +30,7 @@ std::ostream& operator<<(std::ostream& out, const TrafficElement& te) {
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"A", "w"};
-  generic_test_main(argc, argv, param_names, "max_of_sliding_window.tsv",
+  generic_test_main(argc, argv, "max_of_sliding_window.tsv",
                     &CalculateTrafficVolumes);
   return 0;
 }

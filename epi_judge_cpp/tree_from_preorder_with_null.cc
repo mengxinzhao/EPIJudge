@@ -37,8 +37,7 @@ unique_ptr<BinaryTreeNode<int>> ReconstructPreorderWrapper(
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"timer", "preorder"};
-  generic_test_main(argc, argv, param_names, "tree_from_preorder_with_null.tsv",
+  generic_test_main(argc, argv, "tree_from_preorder_with_null.tsv",
                     &ReconstructPreorderWrapper);
   return 0;
 }

@@ -25,8 +25,6 @@ int SquareRoot(int k) {
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"k"};
-  generic_test_main(argc, argv, param_names, "int_square_root.tsv",
-                    &SquareRoot);
+  generic_test_main(argc, argv, "int_square_root.tsv", &SquareRoot);
   return 0;
 }

@@ -9,19 +9,19 @@ import java.util.List;
 
 public class MatrixConnectedRegions {
 
-  public static void flipColor(int x, int y, List<List<Boolean>> image) {
+  public static void flipColor(int x, int y, List<List<Boolean>> A) {
     // Implement this placeholder.
     return;
   }
 
   @EpiTest(testfile = "painting.tsv")
   public static List<List<Integer>>
-  flipColorWrapper(TestTimer timer, int x, int y, List<List<Integer>> image) {
+  flipColorWrapper(TestTimer timer, int x, int y, List<List<Integer>> A) {
     List<List<Boolean>> B = new ArrayList<>();
-    for (int i = 0; i < image.size(); i++) {
+    for (int i = 0; i < A.size(); i++) {
       B.add(new ArrayList<>());
-      for (int j = 0; j < image.get(i).size(); j++) {
-        B.get(i).add(image.get(i).get(j) == 1);
+      for (int j = 0; j < A.get(i).size(); j++) {
+        B.get(i).add(A.get(i).get(j) == 1);
       }
     }
 
@@ -29,15 +29,15 @@ public class MatrixConnectedRegions {
     flipColor(x, y, B);
     timer.stop();
 
-    image = new ArrayList<>();
+    A = new ArrayList<>();
     for (int i = 0; i < B.size(); i++) {
-      image.add(new ArrayList<>());
+      A.add(new ArrayList<>());
       for (int j = 0; j < B.get(i).size(); j++) {
-        image.get(i).add(B.get(i).get(j) ? 1 : 0);
+        A.get(i).add(B.get(i).get(j) ? 1 : 0);
       }
     }
 
-    return image;
+    return A;
   }
 
   public static void main(String[] args) {

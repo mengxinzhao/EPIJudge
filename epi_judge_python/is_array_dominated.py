@@ -10,22 +10,23 @@ class Team:
     def __init__(self, height):
         self._players = [Team.Player(h) for h in height]
 
-    # Checks if team0 can be placed in front of team1.
+    # Checks if A can be placed in front of B.
     @staticmethod
-    def valid_placement_exists(team0, team1):
+    def valid_placement_exists(A, B):
         # Implement this placeholder.
         return True
 
 
 @enable_timer_hook
-def valid_placement_exists_wrapper(timer, team0, team1, expected_01,
-                                   expected10):
-    t0, t1 = Team(team0), Team(team1)
+def valid_placement_exists_wrapper(timer, h1, h2, expected12, expected21):
+    t1, t2 = Team(h1), Team(h2)
 
     timer.start()
-    if Team.valid_placement_exists(
-            t0, t1) != expected_01 or Team.valid_placement_exists(
-                t1, t0) != expected10:
+    result12 = Team.valid_placement_exists(t1, t2)
+    result21 = Team.valid_placement_exists(t2, t1)
+    timer.stop()
+
+    if result12 != expected12 or result21 != expected21:
         raise TestFailureException("")
 
 

@@ -10,8 +10,7 @@ int MinimumTotalWaitingTime(vector<int> service_times) {
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"service_times"};
-  generic_test_main(argc, argv, param_names, "minimum_waiting_time.tsv",
+  generic_test_main(argc, argv, "minimum_waiting_time.tsv",
                     &MinimumTotalWaitingTime);
   return 0;
 }

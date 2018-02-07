@@ -8,16 +8,13 @@ void RookAttack(vector<vector<int>>* A_ptr) {
 }
 
 vector<vector<int>> RookAttackWrapper(vector<vector<int>> A) {
-  vector<vector<int>> a_copy = A;
-  RookAttack(&a_copy);
-  return a_copy;
+  RookAttack(&A);
+  return A;
 }
 
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"A"};
-  generic_test_main(argc, argv, param_names, "rook_attack.tsv",
-                    &RookAttackWrapper);
+  generic_test_main(argc, argv, "rook_attack.tsv", &RookAttackWrapper);
   return 0;
 }

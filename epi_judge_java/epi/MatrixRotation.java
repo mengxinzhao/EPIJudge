@@ -13,10 +13,9 @@ public class MatrixRotation {
   }
 
   @EpiTest(testfile = "matrix_rotation.tsv")
-  public static List<List<Integer>>
-  rotateMatrixWrapper(List<List<Integer>> squareMatrix) {
-    rotateMatrix(squareMatrix);
-    return squareMatrix;
+  public static List<List<Integer>> rotateMatrixWrapper(List<List<Integer>> L) {
+    rotateMatrix(L);
+    return L;
   }
 
   public static void main(String[] args) {

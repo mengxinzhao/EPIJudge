@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "test_framework/test_failure_exception.h"
-#include "test_framework/test_timer.h"
 
 using std::vector;
 
@@ -14,8 +13,8 @@ class Team {
               [](int h) { return Player{h}; });
   }
 
-  // Checks if team0 can be placed in front of team1.
-  static bool ValidPlacementExists(const Team& team0, const Team& team1) {
+  // Checks if A can be placed in front of B.
+  static bool ValidPlacementExists(const Team& A, const Team& B) {
     // Implement this placeholder.
     return true;
   }
@@ -30,13 +29,16 @@ class Team {
   vector<Player> players_;
 };
 
-void ValidPlacementExistsWrapper(TestTimer& timer, const vector<int>& team0,
-                                 const vector<int>& team1, bool expected_01,
-                                 bool expected_10) {
-  Team t0(team0), t1(team1);
-  timer.Start();
-  if (Team::ValidPlacementExists(t0, t1) != expected_01 &&
-      Team::ValidPlacementExists(t1, t0) != expected_10) {
+void ValidPlacementExistsWrapper(const vector<int>& h1, const vector<int>& h2,
+                                 bool expected12, bool expected21) {
+  Team t1(h1), t2(h2);
+  bool result12 = Team::ValidPlacementExists(t1, t2);
+  if (result12 != expected12) {
+    throw TestFailureException("");
+  }
+
+  bool result21 = Team::ValidPlacementExists(t2, t1);
+  if (result21 != expected21) {
     throw TestFailureException("");
   }
 }
@@ -44,9 +46,7 @@ void ValidPlacementExistsWrapper(TestTimer& timer, const vector<int>& team0,
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"timer", "team0", "team1", "expected_01",
-                                       "expected_10"};
-  generic_test_main(argc, argv, param_names, "is_array_dominated.tsv",
+  generic_test_main(argc, argv, "is_array_dominated.tsv",
                     &ValidPlacementExistsWrapper);
   return 0;
 }

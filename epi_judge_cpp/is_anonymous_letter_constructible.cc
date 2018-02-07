@@ -11,9 +11,7 @@ bool IsLetterConstructibleFromMagazine(const string& letter_text,
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"letter_text", "magazine_text"};
-  generic_test_main(argc, argv, param_names,
-                    "is_anonymous_letter_constructible.tsv",
+  generic_test_main(argc, argv, "is_anonymous_letter_constructible.tsv",
                     &IsLetterConstructibleFromMagazine);
   return 0;
 }

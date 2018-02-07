@@ -49,8 +49,6 @@ void RandomSubsetWrapper(TestTimer& timer, int n, int k) {
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  std::vector<std::string> param_names{"timer", "n", "k"};
-  generic_test_main(argc, argv, param_names, "random_subset.tsv",
-                    &RandomSubsetWrapper);
+  generic_test_main(argc, argv, "random_subset.tsv", &RandomSubsetWrapper);
   return 0;
 }
