@@ -51,7 +51,8 @@ vector<vector<int>> Permutations(vector<int> A) {
 #include "test_framework/test_utils_generic_main.h"
 #if 0
 int main(int argc, char* argv[]) {
-  generic_test_main(argc, argv, "permutations.tsv", &Permutations,
+  std::vector<std::string> param_names{"A"};
+  generic_test_main(argc, argv, param_names, "permutations.tsv", &Permutations,
                     &UnorderedComparator<vector<vector<int>>>);
   return 0;
 }

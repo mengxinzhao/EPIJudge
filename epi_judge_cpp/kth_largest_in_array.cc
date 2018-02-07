@@ -64,15 +64,15 @@ int FindKthLargest(int k, vector<int>* A_ptr) {
 	}
 }
 
-
-int FindKthLargestWrapper(int k, vector<int>& v) {
-  return FindKthLargest(k, &v);
+int FindKthLargestWrapper(int k, vector<int>& A) {
+  return FindKthLargest(k, &A);
 }
 
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  generic_test_main(argc, argv, "kth_largest_in_array.tsv",
+  std::vector<std::string> param_names{"k", "A"};
+  generic_test_main(argc, argv, param_names, "kth_largest_in_array.tsv",
                     &FindKthLargestWrapper);
 	//std::vector<int>A({101, 99, 103, 93, 67, 86, 77, 68, 62, 64, 61, 84});
 	//int index = partition(A,0,A.size()-1,1); //  pivot = 68

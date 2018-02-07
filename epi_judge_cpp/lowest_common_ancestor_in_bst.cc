@@ -12,11 +12,11 @@ using std::unique_ptr;
 // the easiest way is to search for the two keys
 // keep the stack. the last common node is LCA
 // this is not O(1) space solution
-BSTNode<int>* FindLCA(const unique_ptr<BSTNode<int>>& tree,
-                      const unique_ptr<BSTNode<int>>& s,
-                      const unique_ptr<BSTNode<int>>& b) {
+BstNode<int>* FindLCA(const unique_ptr<BstNode<int>>& tree,
+                      const unique_ptr<BstNode<int>>& s,
+                      const unique_ptr<BstNode<int>>& b) {
   // Implement this placeholder.
-	BSTNode<int> *p = tree.get();
+	BstNode<int> *p = tree.get();
 	while(p) {
 		if (p->data > b.get()->data) { // > the bigger one between the two
 			p = p->left.get();
@@ -35,12 +35,10 @@ BSTNode<int>* FindLCA(const unique_ptr<BSTNode<int>>& tree,
   return tree.get();
 }
 
-int LcaWrapper(TestTimer& timer, const std::unique_ptr<BSTNode<int>>& root,
-               int key1, int key2) {
-  auto& node1 = MustFindNode(root, key1);
-  auto& node2 = MustFindNode(root, key2);
+int LcaWrapper(TestTimer& timer, const std::unique_ptr<BstNode<int>>& tree,
+               int s, int b) {
   timer.Start();
-  auto result = FindLCA(root, node1, node2);
+  auto result = FindLCA(tree, MustFindNode(tree, s), MustFindNode(tree, b));
   timer.Stop();
   if (!result) {
     throw TestFailureException("Result can not be nullptr");
@@ -51,7 +49,8 @@ int LcaWrapper(TestTimer& timer, const std::unique_ptr<BSTNode<int>>& root,
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  generic_test_main(argc, argv, "lowest_common_ancestor_in_bst.tsv",
-                    &LcaWrapper);
+  std::vector<std::string> param_names{"timer", "tree", "s", "b"};
+  generic_test_main(argc, argv, param_names,
+                    "lowest_common_ancestor_in_bst.tsv", &LcaWrapper);
   return 0;
 }
