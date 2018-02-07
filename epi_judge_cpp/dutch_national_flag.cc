@@ -1,5 +1,7 @@
 #include <array>
 #include <vector>
+#include <algorithm>
+#include <iostream>
 
 #include "test_framework/test_failure_exception.h"
 #include "test_framework/test_timer.h"
@@ -10,6 +12,33 @@ typedef enum { RED, WHITE, BLUE } Color;
 
 void DutchFlagPartition(int pivot_index, vector<Color>* A_ptr) {
   // Implement this placeholder.
+  // better to return error when pivot_index bigger than the length of vector size
+  vector<Color> &v = *A_ptr;
+  int i = 0,num_of_pivot=0;
+  Color pivot = v[pivot_index];
+  vector<int> smaller;
+  vector<int> bigger;
+  while(i <v.size() ) {
+    if  (v[i] <v[pivot_index]){
+      smaller.push_back(v[i]);
+    }else if (v[i]==v[pivot_index]) {
+      num_of_pivot++;
+    } else {
+      bigger.push_back(v[i]);
+    }
+    i++;
+  }
+  i=0;
+  for (; i< smaller.size();i++ ) {
+    v[i] = static_cast<Color>(smaller[i]);
+  }
+  int j=0;
+  for (;j<num_of_pivot;j++ )
+    v[j+i] = pivot;
+  int k = 0;
+  for (; k< bigger.size();k++)
+    v[j+i+k]= static_cast<Color>(bigger[k]);
+
   return;
 }
 

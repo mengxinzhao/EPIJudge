@@ -10,6 +10,10 @@ using std::shared_ptr;
 void InsertAfter(const shared_ptr<ListNode<int>>& node,
                  const shared_ptr<ListNode<int>>& new_node) {
   // Implement this placeholder.
+  if (node == nullptr || new_node == nullptr)
+    return ;
+	new_node->next = node->next;
+  node->next = new_node;
   return;
 }
 

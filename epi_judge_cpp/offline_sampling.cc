@@ -2,6 +2,10 @@
 #include <functional>
 #include <iterator>
 #include <vector>
+#include <random>
+#include <stdlib.h>
+#include <iostream>
+#include <time.h>
 
 #include "test_framework/random_sequence_checker.h"
 #include "test_framework/test_timer.h"
@@ -11,7 +15,17 @@ using std::vector;
 
 void RandomSampling(int k, vector<int>* A_ptr) {
   // Implement this placeholder.
-  return;
+  vector<int> &v = *A_ptr;
+  int size = v.size();
+  std::default_random_engine generator (time(0));
+  for (int i=0; i < k;i++) {
+     std::uniform_int_distribution<int> distribution(i,v.size()-1);
+     int draw = distribution(generator);
+     std::swap(v[i],v[draw]);
+  }
+	// only return k elements
+	v.resize(k);
+  return ;
 }
 
 bool RandomSamplingRunner(TestTimer& timer, int k, vector<int> A) {

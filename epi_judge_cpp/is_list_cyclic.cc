@@ -8,7 +8,30 @@ using std::shared_ptr;
 
 shared_ptr<ListNode<int>> HasCycle(const shared_ptr<ListNode<int>>& head) {
   // Implement this placeholder.
-  return nullptr;
+	// only one element
+	if (head->next  == nullptr)
+		return nullptr;
+	shared_ptr<ListNode<int>> p1 = head;
+	shared_ptr<ListNode<int>> p2 = head;
+	bool cycle = false;
+	while (p1 && p2){
+		p1 = p1 ->next;
+		p2 = p2->next;
+		p2 = p2? p2->next: nullptr;
+		if (p1 == p2 && p2 && p1) {
+			cycle = true;
+			break;
+		}
+	}
+	if (!cycle)
+		return nullptr;
+
+	p2 = head;
+	while (p2!=p1) {
+		p2 = p2->next;
+		p1 = p1->next;
+	}
+  return p1;
 }
 
 void HasCycleWrapper(TestTimer& timer, const shared_ptr<ListNode<int>>& head,

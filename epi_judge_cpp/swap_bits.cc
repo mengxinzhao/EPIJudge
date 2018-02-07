@@ -1,6 +1,9 @@
+#include <iostream>
 long SwapBits(long x, int i, int j) {
   // Implement this placeholder.
-  return 0;
+   long mask = ~((1L<<i)|(1L<<j));
+    x= (x & mask)| ((x >> i )& 0x1 )<< j | ((x >>j) & 0x1) <<i;
+    return x;
 }
 
 #include "test_framework/test_utils_generic_main.h"

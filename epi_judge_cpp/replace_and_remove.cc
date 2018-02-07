@@ -7,9 +7,44 @@
 using std::string;
 using std::vector;
 
+void insertA(char *s,int pos);
+
+
 int ReplaceAndRemove(int size, char s[]) {
   // Implement this placeholder.
-  return 0;
+  // replace all a with dd and remove b
+  // a c b a d e b g e
+  // remove b
+  int j=0;
+  int len  = 0;
+  int num_a = 0;
+  // remove b
+  for (int i=0;i < size; i++) {
+    if (s[i] != 'b') {
+      s[j] = s[i];
+      j++;
+      len++;
+    }
+    if (s[i]=='a')
+      num_a++;
+  }
+  // final length: len + num_a
+  j = len+num_a-1;
+  for (int i=len-1; i>=0;i--) {
+    int k = i;
+    while (s[i]!='a') {
+      i--;
+      if (i <= 0)
+  	  break;
+    }
+    if (s[i] == 'a')  {
+      while (k >= i + 1)
+        s[j--] = s[k--];
+      s[j--] = 'd';
+      s[j--] = 'd';
+    }
+  }
+  return len+num_a;
 }
 
 vector<string> ReplaceAndRemoveWrapper(TestTimer& timer, int size,

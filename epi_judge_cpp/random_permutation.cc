@@ -1,5 +1,7 @@
 #include <functional>
 #include <vector>
+#include <algorithm>
+#include <random>
 
 #include "test_framework/random_sequence_checker.h"
 #include "test_framework/test_timer.h"
@@ -7,9 +9,22 @@
 using std::bind;
 using std::vector;
 
+
 vector<int> ComputeRandomPermutation(int n) {
   // Implement this placeholder.
-  return {};
+	vector <int > v(n,0);
+
+	for (int i=0; i < n; i++)
+		v[i] = i;
+	//randomly generate 0,n-1 numbers
+	std::default_random_engine generator (time(0));
+	for (int i=0; i < n;i++) {
+		std::uniform_int_distribution<int> distribution(i,v.size()-1);
+		int draw = distribution(generator);
+		std::swap(v[i],v[draw]);
+	}
+
+   return v;
 }
 
 int Factorial(int n) { return n <= 1 ? 1 : n * Factorial(n - 1); }

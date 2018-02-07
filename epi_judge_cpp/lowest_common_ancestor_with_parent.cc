@@ -4,10 +4,33 @@
 #include "test_framework/test_failure_exception.h"
 #include "test_framework/test_timer.h"
 
+#include <stack>
 BinaryTreeNode<int>* LCA(const unique_ptr<BinaryTreeNode<int>>& node_0,
                          const unique_ptr<BinaryTreeNode<int>>& node_1) {
   // Implement this placeholder.
-  return nullptr;
+	// track back from parents pointer to the root.the fist common node from the top is common ancester
+	std::stack< BinaryTreeNode<int> *> path0, path1;
+	BinaryTreeNode<int> * p = node_0.get();
+	while (p) {
+		path0.push(p);
+		p = p->parent;
+	}
+	p = node_1.get();
+	while (p) {
+		path1.push(p);
+		p = p->parent;
+	}
+	//the first common ancester
+	while(!path0.empty() && !path1.empty()) {
+		if (path0.top()!=path1.top())
+			return p;
+		else
+			p = path0.top();
+		path0.pop();
+		path1.pop();
+	}
+
+  return p;
 }
 
 int LcaWrapper(TestTimer& timer, const unique_ptr<BinaryTreeNode<int>>& root,

@@ -6,6 +6,12 @@ using std::shared_ptr;
 
 shared_ptr<ListNode<int>> SearchList(shared_ptr<ListNode<int>> L, int key) {
   // Implement this placeholder.
+  shared_ptr<ListNode<int>> p = L;
+  while (p) {
+    if (p->data==key)
+      return p;
+	   p = p->next;
+  }
   return nullptr;
 }
 

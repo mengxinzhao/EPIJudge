@@ -10,7 +10,16 @@ struct MinMax {
 
 MinMax FindMinMax(const vector<int>& A) {
   // Implement this placeholder.
-  return {0, 0};
+  MinMax val = {INT_MAX, INT_MIN};
+  for (int i =0 ; i< A.size();i++) {
+    if (val.smallest > A[i]) {
+      val.smallest = A[i];
+    }
+    if (val.largest < A [i]) {
+      val.largest = A[i];
+    }
+  }
+  return val;
 }
 
 template <>

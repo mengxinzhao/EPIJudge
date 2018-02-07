@@ -1,21 +1,40 @@
 #include <algorithm>
 #include <functional>
-#include <iterator>
 #include <vector>
-
+#include <random>
+#include <iostream>
+#include <time.h>
+#include <unordered_map>
 #include "test_framework/random_sequence_checker.h"
 #include "test_framework/test_timer.h"
 
 using std::bind;
 using std::sort;
 using std::vector;
+using std::unordered_map;
 
 // Assumption: there are at least k elements in the stream.
+// https://en.wikipedia.org/wiki/Reservoir_sampling
 vector<int> OnlineRandomSample(vector<int>::const_iterator stream_begin,
                                const vector<int>::const_iterator stream_end,
                                int k) {
   // Implement this placeholder.
-  return {};
+  vector<int> v(stream_begin, stream_begin+k);
+
+  int stream_size =  std::distance(stream_begin,stream_end);
+  //std::cout<<"size : "<<stream_size << std::endl;
+  std::default_random_engine generator (time(0));
+  for (int i=k ; i < stream_size ; i++) {
+	  //std::uniform_int_distribution<int> distribution(0,i);
+      //int draw = distribution(generator);
+      //uniform distribution here doesn't pass the judge. why? need to use random number generation
+	  int draw = rand() % (i+1);
+      if (draw < k) {
+	      // k/(i+1) of replacement 1-k/(i+1) of keeping
+	      v[draw] = *(stream_begin+i);
+      }
+  }
+  return v;
 }
 
 bool OnlineRandomSamplingRunner(TestTimer& timer, vector<int> A, int k) {

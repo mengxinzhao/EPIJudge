@@ -4,6 +4,15 @@
 // Assumes node_to_delete is not tail.
 void DeletionFromList(const shared_ptr<ListNode<int>>& node_to_delete) {
   // Implement this placeholder.
+	// need to find its previous
+	if (node_to_delete == nullptr)
+		return ;
+	int next_val = node_to_delete->next->data;
+	// delete the next node and replace this node's value
+	shared_ptr<ListNode<int>> p = node_to_delete->next;
+	node_to_delete->next = node_to_delete->next->next;
+	node_to_delete->data = next_val;
+	p.reset();
   return;
 }
 

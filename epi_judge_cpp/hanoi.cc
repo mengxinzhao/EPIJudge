@@ -2,7 +2,7 @@
 #include <stack>
 #include <string>
 #include <vector>
-
+#include <iostream>
 #include "test_framework/test_failure_exception.h"
 #include "test_framework/test_timer.h"
 
@@ -12,9 +12,26 @@ using std::vector;
 
 const int kNumPegs = 3;
 
+void move(int num,vector<vector<int>>  &towers,int from, int to,int through ){
+	if (num<=0)
+		return;
+	move(num-1,towers,from,through,to);
+	towers[to].push_back(towers[from].back());
+	towers[from].pop_back();
+	std::cout<<"move from "<<from<<" to "<<to<< std::endl;
+	move(num-1,towers,through,to,from);
+
+}
+
 vector<vector<int>> ComputeTowerHanoi(int num_rings) {
   // Implement this placeholder.
-  return {};
+	vector<vector<int>> towers(3, vector<int>());
+	for(int i = num_rings;i>=1;i--){
+		towers[0].push_back(i);
+	}
+	move(num_rings,towers,0,1,2);
+
+  return towers;
 }
 
 void ComputeTowerHanoiWrapper(TestTimer& timer, int num_rings) {

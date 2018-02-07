@@ -1,11 +1,26 @@
-#include <vector>
+  #include <vector>
 
 using std::vector;
 
 // Returns the number of valid entries after deletion.
 int DeleteDuplicates(vector<int>* A_ptr) {
   // Implement this placeholder.
-  return 0;
+    vector<int> & v = *A_ptr;
+
+	if (v.empty())
+		return 0;
+
+    if (v.size() == 1)
+      return 1;
+
+	int pos = 0;
+	for (int i=0; i < v.size()-1;i++) {
+		if (v[i]!= v[i+1])
+			v[pos++] = v[i];
+	}
+	v[pos++] = v[v.size()-1];
+
+    return pos;
 }
 
 vector<int> DeleteDuplicatesWrapper(vector<int> A) {

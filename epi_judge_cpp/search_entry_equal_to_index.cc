@@ -7,7 +7,25 @@ using std::vector;
 
 int SearchEntryEqualToItsIndex(const vector<int>& A) {
   // Implement this placeholder.
-  return 0;
+	int left = 0, right = A.size()-1, mid;
+
+	while(left <= right) {
+		mid = (left + right )/2;// assuming no overflow
+		if (A[mid] > mid) {
+			// A is sorted so  A[mid] < A[A[mid]]
+			//                 mid  <  A[mid]
+			// to find A[mid] = mid needs to move
+			right = mid-1;
+		}else if (A[mid] == mid)
+			return mid;
+		else {
+			// A is sorted so  A[A[mid]] <    A[mid]
+			//                 A[mid]    <    mid
+			// to find A[mid] = mid needs to move
+			left = mid+1;
+		}
+	}
+  return -1;
 }
 
 void SearchEntryEqualToItsIndexWrapper(TestTimer& timer, const vector<int>& A) {

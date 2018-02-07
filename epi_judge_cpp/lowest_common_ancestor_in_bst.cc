@@ -9,11 +9,30 @@ using std::unique_ptr;
 
 // Input nodes are nonempty and the key at s is less than or equal to that at
 // b.
+// the easiest way is to search for the two keys
+// keep the stack. the last common node is LCA
+// this is not O(1) space solution
 BSTNode<int>* FindLCA(const unique_ptr<BSTNode<int>>& tree,
                       const unique_ptr<BSTNode<int>>& s,
                       const unique_ptr<BSTNode<int>>& b) {
   // Implement this placeholder.
-  return nullptr;
+	BSTNode<int> *p = tree.get();
+	while(p) {
+		if (p->data > b.get()->data) { // > the bigger one between the two
+			p = p->left.get();
+		}else if (p->data < s.get()->data) { // < the smaller one between the two
+			p = p->right.get();
+		}else if ((p->data > s.get()->data && p->data < b.get()->data)
+						  ||(p->data == s.get()->data)
+		          || (p->data== b.get()->data))
+			// can't meet both
+			// smaller one gets searched first. bigger node is on its right branch
+			// bigger one gets searched first. smaller node is on its left branch
+			return p;
+
+	}
+
+  return tree.get();
 }
 
 int LcaWrapper(TestTimer& timer, const std::unique_ptr<BSTNode<int>>& root,
