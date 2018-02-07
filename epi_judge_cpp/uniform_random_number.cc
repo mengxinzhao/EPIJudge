@@ -1,6 +1,7 @@
 #include <functional>
 #include <random>
 #include <vector>
+#include <iostream>
 
 #include "test_framework/random_sequence_checker.h"
 #include "test_framework/test_timer.h"
@@ -19,7 +20,20 @@ int ZeroOneRandom() {
 
 int UniformRandom(int lower_bound, int upper_bound) {
   // Implement this placeholder.
-  return 0;
+  if (lower_bound >= upper_bound) {
+    //std::cout<<"return "<<lower_bound<<std::endl;
+    return lower_bound;
+  }
+  //if (lower_bound+1== upper_bound)
+  //  return lower_bound+ZeroOneRandom();
+  else {
+    int mid = (upper_bound + lower_bound)/2;
+    if (ZeroOneRandom())
+      return UniformRandom(mid+1,upper_bound);
+    else
+      return UniformRandom(lower_bound,mid);
+  }
+
 }
 
 bool UniformRandomRunner(TestTimer& timer, int lower_bound, int upper_bound) {
