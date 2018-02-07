@@ -108,12 +108,12 @@ std::string GetDefaultTestDataDirPath() {
   constexpr int MAX_SEARCH_DEPTH = 4;
   const std::string ENV_KEY = "EPI_TEST_DATA_DIR";
   const std::string DIR_NAME = "test_data";
-  char pardir[]{'.', '.', os::PathSep(), '\0'};
+  char pardir[]{'.', '.', platform::PathSep(), '\0'};
   std::string path;
 
   const char* env_result = std::getenv(ENV_KEY.c_str());
   if (env_result && env_result[0] != '\0') {
-    if (!os::IsDir(env_result)) {
+    if (!platform::IsDir(env_result)) {
       throw std::runtime_error(ENV_KEY +
                                " environment variable is set to \"" +
                                env_result + "\", but it's not a directory");
@@ -124,7 +124,7 @@ std::string GetDefaultTestDataDirPath() {
 
   path = DIR_NAME;
   for (int i = 0; i < MAX_SEARCH_DEPTH; i++) {
-    if (os::IsDir(path.c_str())) {
+    if (platform::IsDir(path.c_str())) {
       return path;
     }
     path.insert(0, pardir);
@@ -138,27 +138,28 @@ std::string GetDefaultTestDataDirPath() {
 }  // namespace
 
 template <typename TestHandlerT>
-void RunTests(const std::string& test_data_path, TestHandlerT& handler,
-              const std::chrono::milliseconds& timeout, bool stop_on_error) {
+void RunTests(std::string test_data_path, TestHandlerT& handler,
+              const std::chrono::milliseconds& timeout, bool stop_on_error,
+              std::vector<std::string> param_names) {
   std::vector<std::vector<std::string>> test_data =
       SplitTsvFile(test_data_path);
   handler.ParseSignature(test_data[0]);
 
-  int test_nr = 0;
-  const int total_tests = static_cast<int>(test_data.size() - 1);
+  if (handler.HasTimerHook()) {
+    param_names.erase(param_names.begin()); //Remove "timer" parameter
+  }
+  int first_test_idx = 1;
+  int test_nr = 1;
+  const int total_tests = static_cast<int>(test_data.size() - first_test_idx);
   int tests_passed = 0;
   const bool use_timeout = (timeout != timeout.zero());
   std::vector<std::chrono::microseconds> durations;
 
-  for (std::vector<std::string> test_case :
-       std::vector<std::vector<std::string>>{std::next(std::begin(test_data)),
-                                             std::end(test_data)}) {
-    ++test_nr;
-
+  for (int i = first_test_idx; i < test_data.size(); ++i, ++test_nr) {
     // Since the last field of test_data is test_explanation, which is not
     // used for running test, we extract that here.
-    const std::string test_explanation = std::move(test_case.back());
-    test_case.pop_back();
+    const std::string test_explanation = std::move(test_data[i].back());
+    test_data[i].pop_back();
 
     TestResult result = FAILED;
     typename TestHandlerT::test_output_t test_output;
@@ -166,8 +167,9 @@ void RunTests(const std::string& test_data_path, TestHandlerT& handler,
 
     try {
       if (use_timeout) {
-        auto run_test_future = std::async(
-            std::launch::async, [&] { return handler.RunTest(test_case); });
+        auto run_test_future = std::async(std::launch::async, [&] {
+          return handler.RunTest(test_data[i]);
+        });
 
         if (run_test_future.wait_for(timeout) == std::future_status::ready) {
           test_output = run_test_future.get();
@@ -176,7 +178,7 @@ void RunTests(const std::string& test_data_path, TestHandlerT& handler,
           result = TIMEOUT;
         }
       } else {
-        test_output = handler.RunTest(test_case);
+        test_output = handler.RunTest(test_data[i]);
         result = test_output.comparison_result ? PASSED : FAILED;
       }
 
@@ -193,10 +195,8 @@ void RunTests(const std::string& test_data_path, TestHandlerT& handler,
       diagnostic = "???";
     }
 
-    // TODO(THL): How to handle the situation when test_result is not valid
-    // due to exception?  We handle this in Java and Python.
-    PrintTestResult(result, test_nr, total_tests, diagnostic,
-                    test_output.timer);
+    PrintTestInfo(result, test_nr, total_tests, diagnostic,
+                  test_output.timer);
     if (result == PASSED) {
       tests_passed++;
     }
@@ -205,9 +205,9 @@ void RunTests(const std::string& test_data_path, TestHandlerT& handler,
     }
     if (result != PASSED && stop_on_error) {
       if (!handler.ExpectedIsVoid()) {
-        test_case.pop_back();
+        test_data[i].pop_back();
       }
-      PrintFailedTest(test_case, test_output, test_explanation);
+      PrintFailedTest(param_names, test_data[i], test_output, test_explanation);
       break;
     }
   }
@@ -224,7 +224,7 @@ void RunTests(const std::string& test_data_path, TestHandlerT& handler,
                        durations_size)
                 << std::endl;
       std::sort(std::begin(durations), std::end(durations));
-      std::cout << "Median running time: "
+      std::cout << "Median running time:  "
                 << DurationToString(durations_size & 1
                                         ? durations[durations_size / 2]
                                         : (durations[durations_size / 2 - 1] +

@@ -6,6 +6,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * The central class in generic test runner framework.
@@ -38,52 +40,59 @@ import java.util.function.Function;
  * <p>
  */
 public class GenericTestHandler implements TestHandler {
-  private Method testedMethod;
-  private List<Type> methodParameters;
-  private Function<String, Object>[] argParsers;
-  private Function<String, Object> retParser;
+  private Method func;
+  private List<Type> paramTypes;
+  private boolean hasTimerHook;
+  private Function<String, Object>[] paramParsers;
+  private List<String> paramNames;
+  private Function<String, Object> retValueParser;
   private BiPredicate<Object, Object> comparator;
   private boolean customExpectedType;
-  private boolean hasTimerHook;
 
   /**
    * This constructor initializes type parsers for all arguments and return type
-   * of m.
+   * of func.
    *
-   * @param m            - a method to test.
+   * @param func            - a method to test.
    * @param comparator   - an optional comparator for result. If comparator is
    *                     null, values are compared with equals().
    * @param expectedType - can be used with a custom comparator that has
    *                     different types for expected and result arguments.
    */
-  public GenericTestHandler(Method m, BiPredicate<Object, Object> comparator,
+  public GenericTestHandler(Method func, BiPredicate<Object, Object> comparator,
                             List<Class<?>> expectedType) {
-    testedMethod = m;
+    this.func = func;
     this.comparator = comparator;
 
     hasTimerHook = false;
 
-    methodParameters = Arrays.asList(m.getGenericParameterTypes());
-    if (methodParameters.size() >= 1 &&
-        methodParameters.get(0).equals(TestTimer.class)) {
+    paramTypes = Arrays.asList(func.getGenericParameterTypes());
+    if (paramTypes.size() >= 1 && paramTypes.get(0).equals(TestTimer.class)) {
       hasTimerHook = true;
-      methodParameters = methodParameters.subList(1, methodParameters.size());
+      paramTypes = paramTypes.subList(1, paramTypes.size());
     }
 
     @SuppressWarnings("unchecked")
-    Function<String, Object>[] A = new Function[methodParameters.size()];
-    argParsers = A;
+    Function<String, Object>[] A = new Function[paramTypes.size()];
+    paramParsers = A;
 
-    for (int i = 0; i < methodParameters.size(); i++) {
-      argParsers[i] = TestUtilsDeserialization.getTypeParser(
-          TestUtilsDeserialization.linearizeType(methodParameters.get(i)));
+    for (int i = 0; i < paramTypes.size(); i++) {
+      paramParsers[i] = TestUtilsDeserialization.getTypeParser(
+          TestUtilsDeserialization.linearizeType(paramTypes.get(i)));
+    }
+
+    paramNames = Arrays.stream(func.getParameters())
+                     .map(p -> p.getName())
+                     .collect(Collectors.toList());
+    if (hasTimerHook) {
+      paramNames.remove(0);
     }
 
     if (expectedType == null) {
-      retParser = TestUtilsDeserialization.getTypeParser(
-          TestUtilsDeserialization.linearizeType(m.getGenericReturnType()));
+      retValueParser = TestUtilsDeserialization.getTypeParser(
+          TestUtilsDeserialization.linearizeType(func.getGenericReturnType()));
     } else {
-      retParser = TestUtilsDeserialization.getTypeParser(expectedType);
+      retValueParser = TestUtilsDeserialization.getTypeParser(expectedType);
     }
 
     customExpectedType = expectedType != null;
@@ -96,13 +105,13 @@ public class GenericTestHandler implements TestHandler {
    * @param signature - the header from a test data file.
    */
   public void parseSignature(List<String> signature) {
-    if (signature.size() != methodParameters.size() + 1) {
-      throw new RuntimeException("Argument type count mismatch");
+    if (signature.size() != paramTypes.size() + 1) {
+      throw new RuntimeException("Signature parameter count mismatch");
     }
 
-    for (int i = 0; i < methodParameters.size(); i++) {
+    for (int i = 0; i < paramTypes.size(); i++) {
       if (!TestUtilsDeserialization.matchArgumentType(
-              methodParameters.get(i),
+              paramTypes.get(i),
               TestUtils.filterBracketComments(signature.get(i)))) {
         throw new RuntimeException(Integer.toString(i) +
                                    "th argument type mismatch");
@@ -111,7 +120,7 @@ public class GenericTestHandler implements TestHandler {
 
     if (!customExpectedType) {
       if (!TestUtilsDeserialization.matchArgumentType(
-              testedMethod.getGenericReturnType(),
+              this.func.getGenericReturnType(),
               TestUtils.filterBracketComments(
                   signature.get(signature.size() - 1)))) {
         throw new RuntimeException("Return type mismatch");
@@ -131,13 +140,14 @@ public class GenericTestHandler implements TestHandler {
    */
   public TestOutput runTest(List<String> testArgs) throws Exception {
     try {
-      if (testArgs.size() != argParsers.length + (retParser != null ? 1 : 0)) {
+      if (testArgs.size() !=
+          paramParsers.length + (retValueParser != null ? 1 : 0)) {
         throw new RuntimeException("Invalid argument count");
       }
 
       List<Object> parsed = new ArrayList<>();
-      for (int i = 0; i < argParsers.length; i++) {
-        parsed.add(argParsers[i].apply(testArgs.get(i)));
+      for (int i = 0; i < paramParsers.length; i++) {
+        parsed.add(paramParsers[i].apply(testArgs.get(i)));
       }
 
       TestTimer timer = new TestTimer();
@@ -147,17 +157,18 @@ public class GenericTestHandler implements TestHandler {
       }
 
       if (!expectedIsVoid()) {
-        Object expected = retParser.apply(testArgs.get(testArgs.size() - 1));
+        Object expected =
+            retValueParser.apply(testArgs.get(testArgs.size() - 1));
 
         timer.start();
-        Object result = testedMethod.invoke(null, parsed.toArray());
+        Object result = this.func.invoke(null, parsed.toArray());
         timer.stop();
 
         return new TestOutput(compareResults(expected, result), timer, expected,
                               result);
       } else {
         timer.start();
-        testedMethod.invoke(null, parsed.toArray());
+        this.func.invoke(null, parsed.toArray());
         timer.stop();
 
         return new TestOutput(true, timer);
@@ -166,7 +177,9 @@ public class GenericTestHandler implements TestHandler {
       throw new RuntimeException(e.getMessage());
     } catch (InvocationTargetException e) {
       Throwable t = e.getTargetException();
-      if (t instanceof Exception) {
+      if (t instanceof StackOverflowError) {
+        throw(StackOverflowError) t;
+      } else if (t instanceof Exception) {
         throw(Exception) t;
       } else {
         throw new RuntimeException(t.getMessage());
@@ -194,7 +207,12 @@ public class GenericTestHandler implements TestHandler {
 
   @Override
   public boolean expectedIsVoid() {
-    return retParser == null;
+    return retValueParser == null;
+  }
+
+  @Override
+  public List<String> paramNames() {
+    return paramNames;
   }
 
   @SuppressWarnings("unchecked")
@@ -282,34 +300,38 @@ public class GenericTestHandler implements TestHandler {
                                   BiPredicate<Object, Object> comparator,
                                   List<Class<?>> expectedType,
                                   String[] commandlineArgs) {
-    boolean stopOnAError = true;
-    String testDataDir = null;
-    for (int i = 0; i < commandlineArgs.length; i++) {
-      if (Objects.equals(commandlineArgs[i], "--test_data_dir")) {
-        if (i + 1 >= commandlineArgs.length) {
-          throw new RuntimeException("Missing param for --test_data_dir");
+    try {
+      boolean stopOnAError = true;
+      String testDataDir = null;
+      for (int i = 0; i < commandlineArgs.length; i++) {
+        if (Objects.equals(commandlineArgs[i], "--test_data_dir")) {
+          if (i + 1 >= commandlineArgs.length) {
+            throw new RuntimeException("Missing param for --test_data_dir");
+          }
+          testDataDir = commandlineArgs[i + 1];
+          i++;
+        } else if (Objects.equals(commandlineArgs[i], "--run_all_tests")) {
+          stopOnAError = false;
+        } else {
+          throw new RuntimeException("Unrecognized argument: " +
+                                     commandlineArgs[i]);
         }
-        testDataDir = commandlineArgs[i + 1];
-        i++;
-      } else if (Objects.equals(commandlineArgs[i], "--run_all_tests")) {
-        stopOnAError = false;
+      }
+
+      if (testDataDir != null && !testDataDir.isEmpty()) {
+        if (!Files.isDirectory(Paths.get(testDataDir))) {
+          throw new RuntimeException("--test_data_dir argument \"" +
+                                     testDataDir + "\" is not a directory");
+        }
       } else {
-        throw new RuntimeException("Unrecognized argument: " +
-                                   commandlineArgs[i]);
+        testDataDir = TestUtils.getDefaultTestDataDirPath();
       }
-    }
 
-    if (testDataDir != null && !testDataDir.isEmpty()) {
-      if (!Files.isDirectory(Paths.get(testDataDir))) {
-        throw new RuntimeException("--test_data_dir argument \"" + testDataDir +
-                                   "\" is not a directory");
-      }
-    } else {
-      testDataDir = TestUtils.getDefaultTestDataDirPath();
+      TestUtils.runTests(Paths.get(testDataDir, testfile),
+                         new GenericTestHandler(m, comparator, expectedType), 0,
+                         stopOnAError);
+    } catch (RuntimeException e) {
+      System.err.println("\nCritical error: " + e.getMessage());
     }
-
-    TestUtils.runTests(Paths.get(testDataDir, testfile),
-                       new GenericTestHandler(m, comparator, expectedType), 0,
-                       stopOnAError);
   }
 }

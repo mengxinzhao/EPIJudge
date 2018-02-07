@@ -5,12 +5,13 @@
 #include <stack>
 
 using std::unique_ptr;
+
 // need to use BST property
-BSTNode<int>* FindFirstGreaterThanK(const unique_ptr<BSTNode<int>>& tree,
+BstNode<int>* FindFirstGreaterThanK(const unique_ptr<BstNode<int>>& tree,
                                     int k) {
   // Implement this placeholder.
-	BSTNode<int> * p = tree.get();
-	BSTNode<int> * q = nullptr;
+	BstNode<int> * p = tree.get();
+	BstNode<int> * q = nullptr;
 	if (p == nullptr)
 		return nullptr;
 	// find the first node > k along the path
@@ -26,8 +27,8 @@ BSTNode<int>* FindFirstGreaterThanK(const unique_ptr<BSTNode<int>>& tree,
 		return p;
 	//left -> node-> right travel the subtree with root p
 	//return the first node value > k
-	std::stack<BSTNode<int> *>path;
-	std::set<BSTNode <int> * >seen;
+	std::stack<BstNode<int> *>path;
+	std::set<BstNode <int> * >seen;
 	path.push(p);
 	while(!path.empty()) {
 		p = path.top();
@@ -53,12 +54,12 @@ BSTNode<int>* FindFirstGreaterThanK(const unique_ptr<BSTNode<int>>& tree,
 
 // need to use BST property
 // if key doesn't exist or no key larger than k is present return nullptr
-BSTNode<int>* FindFirstGreaterThanK2(const unique_ptr<BSTNode<int>>& tree,
+BstNode<int>* FindFirstGreaterThanK2(const unique_ptr<BstNode<int>>& tree,
                                     int k) {
 	// Implement this placeholder.
-	BSTNode<int> * p = tree.get();
-	BSTNode<int> * q = nullptr;
-	BSTNode<int> *r = nullptr;
+	BstNode<int> * p = tree.get();
+	BstNode<int> * q = nullptr;
+	BstNode<int> *r = nullptr;
 
 	while(p) {
 		if (p->data > k) {
@@ -78,15 +79,18 @@ BSTNode<int>* FindFirstGreaterThanK2(const unique_ptr<BSTNode<int>>& tree,
 }
 
 
-int FindFirstGreaterThanKWrapper(const unique_ptr<BSTNode<int>>& tree, int k) {
-  auto result = FindFirstGreaterThanK(tree, k);
+
+int FindFirstGreaterThanKWrapper(const unique_ptr<BstNode<int>>& tree, int k) {
+  auto result = FindFirstGreaterThanK2(tree, k);
   return result ? result->data : -1;
 }
 
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
-  generic_test_main(argc, argv, "search_first_greater_value_in_bst.tsv",
+  std::vector<std::string> param_names{"tree", "k"};
+  generic_test_main(argc, argv, param_names,
+                    "search_first_greater_value_in_bst.tsv",
                     &FindFirstGreaterThanKWrapper);
   return 0;
 }
