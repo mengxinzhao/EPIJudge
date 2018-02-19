@@ -1,8 +1,24 @@
+#include <iostream>
+#include <vector>
+using std::vector;
+// NumberOfWays[N,M] = NumberOfWays[N-1,M] (coming from N-1 row, same column)
+//              + NumberOfWays[N,M-1]  (coming from M-1 column, same row)
+int NumberOfWays(int N, int M) {
+    // Implement this placeholder.
+    vector<vector<int>> ways(N,vector<int>(M,0));
+    // the first row
+    ways[0] = vector<int>(M,1);
+    // the first column
+    for (int row = 1; row < N;row++)
+        ways[row][0] = 1;
 
+    // travel
+    for (int row = 1; row < N; row++)
+        for (int column = 1; column< M; column++) {
+            ways[row][column] += ways[row-1][column] + ways[row][column-1];
+        }
+    return ways[N-1][M-1];
 
-int NumberOfWays(int n, int m) {
-  // Implement this placeholder.
-  return 0;
 }
 
 #include "test_framework/test_utils_generic_main.h"
