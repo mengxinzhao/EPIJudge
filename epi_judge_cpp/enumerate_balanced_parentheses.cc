@@ -2,39 +2,45 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
-#include <set>
 using std::string;
 using std::vector;
 
-void GenerateBalancedParenthesesHelper(int start, int num_pairs, string &current, std::set<string> & result) {
-    if (start >=num_pairs)
-        return ;
-    for (int k = start; start < num_pairs; start ++)
-        for (int i=start+1; i<num_pairs; i++) {
-            if (current[start*2+1]!=current[2*i]) {
-                std::swap(current[start*2+1],current[2*i]);
-                //std::cout<<current<<std::endl;
-                result.insert(current);
-                GenerateBalancedParenthesesHelper(start+1, num_pairs,current,result);
-                std::swap(current[start*2+1],current[2*i]);
-            }
+void GenerateBalancedParenthesesHelper(int num_left_left, int num_right_left, string current, vector<string> & result) {
+    
+    if (num_left_left == 0 && num_right_left == 0) {
+        result.push_back(current);
+        return;
     }
+
+    if (num_left_left == 0 && num_right_left > 0) {
+        // only can insert ')'
+        current.insert(current.end(),')');
+        GenerateBalancedParenthesesHelper(num_left_left,num_right_left-1, current,result);
+    }else if (num_left_left == num_right_left) {
+        // when number of left parens and right parens are matching choose left
+        current.insert(current.end(),'(');
+        GenerateBalancedParenthesesHelper(num_left_left-1,num_right_left, current,result);
+    }else {
+        // can choose '(' or ')'
+        //
+        string left_insert = current;
+        left_insert.insert(left_insert.end(),'(');
+        GenerateBalancedParenthesesHelper(num_left_left-1,num_right_left, left_insert,result);
+        
+        string right_insert = current;
+        right_insert.insert(right_insert.end(),')');
+        GenerateBalancedParenthesesHelper(num_left_left,num_right_left-1, right_insert,result);
+    }
+    return;
+
 }
 
 vector<string> GenerateBalancedParentheses(int num_pairs) {
-  // Implement this placeholder.
-  
+    // Implement this placeholder.
+    
     vector<string> result{};
-    if (num_pairs == 0)
-        return {("")};
-    string first{};
-    std::set<string> result_set;
-    for (int i=0;i< num_pairs;i++)
-        first.insert(0,"()");
-    result_set.insert(first);
-    GenerateBalancedParenthesesHelper(0,num_pairs,first, result_set);
-    for (auto &e:result_set)
-        result.push_back(e);
+    string current = {""};
+    GenerateBalancedParenthesesHelper(num_pairs, num_pairs, current, result);
     return result;
 }
 
