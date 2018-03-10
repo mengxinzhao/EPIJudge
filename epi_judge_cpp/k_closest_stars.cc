@@ -42,7 +42,7 @@ vector<Star> FindClosestKStars(vector<Star>::const_iterator stars_begin,
     while(it != stars_end) {
         max_heap.emplace(*it);
         it++;
-        // only keep the k element in the heap
+        // only keep k elements in the heap
         if (max_heap.size()>k)
             max_heap.pop();
     }
@@ -51,7 +51,7 @@ vector<Star> FindClosestKStars(vector<Star>::const_iterator stars_begin,
         result.push_back(max_heap.top());
         max_heap.pop();
     }
-    // reverse the array to become  distane ascending order
+    // reverse the array to become  distance ascending order
     std::reverse(result.begin(), result.end());
     return result;
 }
