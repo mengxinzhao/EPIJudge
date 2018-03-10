@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <cmath>
 #include <vector>
+#include <iterator>
+#include <queue>
 
 #include "test_framework/test_utils.h"
 #include "test_framework/test_utils_serialization_traits.h"
@@ -8,7 +10,7 @@
 using std::vector;
 
 struct Star {
-  bool operator<(const Star& that) const {
+  bool operator < (const Star& that) const {
     return Distance() < that.Distance();
   }
 
@@ -17,11 +19,41 @@ struct Star {
   double x, y, z;
 };
 
+template <typename T>
+class Compare
+{
+public:
+    // similar to std::greater
+    bool operator() (T one, T two) {
+        return (one < two);
+    }
+};
+// Build a max heap with k elements
+// keep poping the top and inserting new element will all data is processed and return the left k max in the heap
+// O(log(k))  insertion complexity
+// O(Nlog(k)) total complexity
 vector<Star> FindClosestKStars(vector<Star>::const_iterator stars_begin,
                                const vector<Star>::const_iterator& stars_end,
                                int k) {
-  // Implement this placeholder.
-  return {};
+    std::priority_queue<Star, vector<Star>, Compare<Star> > max_heap;
+    vector<Star> result;
+
+    auto it = stars_begin;
+    while(it != stars_end) {
+        max_heap.emplace(*it);
+        it++;
+        // only keep the k element in the heap
+        if (max_heap.size()>k)
+            max_heap.pop();
+    }
+
+    while(!max_heap.empty()) {
+        result.push_back(max_heap.top());
+        max_heap.pop();
+    }
+    // reverse the array to become  distane ascending order
+    std::reverse(result.begin(), result.end());
+    return result;
 }
 
 template <>
