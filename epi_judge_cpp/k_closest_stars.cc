@@ -23,13 +23,13 @@ template <typename T>
 class Compare
 {
 public:
-    // similar to std::greater
+    // similar to std::less
     bool operator() (T one, T two) {
         return (one < two);
     }
 };
 // Build a max heap with k elements
-// keep poping the top and inserting new element will all data is processed and return the left k max in the heap
+// keep poping the top and inserting new element till all data is processed and return  k elements left in the heap
 // O(log(k))  insertion complexity
 // O(Nlog(k)) total complexity
 vector<Star> FindClosestKStars(vector<Star>::const_iterator stars_begin,
