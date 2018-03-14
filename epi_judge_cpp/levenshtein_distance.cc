@@ -1,30 +1,33 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <utility>
+#include <map>
 
 using std::string;
 using std::vector;
+using std::pair;
+using std::map;
 
-// editting distance from A to B
-int editDistance(const string &A, int i, const string &B, int j) {
-    if( i == 0 )
-        return j; // all insertion
-    
-    if (j == 0)
-        return i; // all deletion
-    
-    if (A[i-1] == B[j-1])
-        return editDistance(A, i-1,B,j-1);
-    
-    //consider all possible solutions
-    return 1+ std::min(std::min(editDistance(A,i-1,B,j),  //A[i] deleted
-                       editDistance(A,i, B, j-1)),      // B[i] deleted
-                       editDistance(A,i-1, B, j-1));  //change
-}
+// O(N*M) complexity N= A_size M = B_size
+// O(N*M) space
 int LevenshteinDistance(const string& A, const string& B) {
-  
-
-    return  editDistance(A,A.length(), B, B.length());
+    // cache i,j, edit distance. needs to consider empty string.
+    vector<vector<int>>tbl(A.length()+1,vector<int>(B.length()+1,0));
+    
+    for (int i = 0; i <=A.length(); i++)
+        for (int j =0; j <=B.length(); j++) {
+            if (i==0)
+                tbl[i][j] = j ; // all insertion
+            else if (j==0)
+                tbl[i][j] = i ; // all deletion
+            else if (A[i-1] == B[j-1])
+                tbl[i][j] = tbl[i-1][j-1];
+            else {
+                tbl[i][j]  = 1 + std::min(std::min(tbl[i-1][j],tbl[i][j-1]),tbl[i-1][j-1]  );
+            }
+        }
+    return tbl[A.length()][B.length()];
 }
 
 #include "test_framework/test_utils_generic_main.h"
