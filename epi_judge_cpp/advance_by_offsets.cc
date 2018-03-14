@@ -2,7 +2,9 @@
 #include <iostream>
 
 using std::vector;
-
+// this is very inefficient solution
+// m step each element, N element in array
+// O(N^m)
 bool reachable(int i, int j,vector<int> max_advance_steps ) {
 	// i = start, j = end
 	if (i==j) return true;
