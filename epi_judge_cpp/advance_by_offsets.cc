@@ -1,32 +1,24 @@
 #include <vector>
 #include <iostream>
+#include <cstddef>
 
 using std::vector;
-// this is very inefficient solution
-// m step each element, N element in array
-// O(N^m)
-bool reachable(int i, int j,vector<int> max_advance_steps ) {
-	// i = start, j = end
-	if (i==j) return true;
 
-	// jump forward
-	if ((j>i) && max_advance_steps[i]>=0 &&  max_advance_steps[i] >=j-i)
-		return true;
-	// jump backward
-	if ((j<i) && max_advance_steps[i] < 0 && max_advance_steps[i] < j - i)
-		return true;
-
-	// if reachable using an intermediate  node
-	for (int step = 1; step <=max_advance_steps[i];step++)
-		if (reachable(i,i+step, max_advance_steps) && reachable(i+step,j,max_advance_steps) == true)
-			return true;
-	return false;
-}
+//O(N^2) complexity
+//O(N) space
 bool CanReachEnd(const vector<int>& max_advance_steps) {
-	// Implement this placeholder.
-	// 0, minus numbers might be present
-
-	return reachable(0, max_advance_steps.size()-1, max_advance_steps);
+    vector<int> tbl(max_advance_steps.size(),0);
+    tbl[0]=1;
+    
+    // build up the cache
+    // reachable(i,j) = reachable(i,j-step) && max_advance_steps[j-step] >= step
+    for (int i =1 ; i < max_advance_steps.size();i++)
+        for (int step = 1 ; step <=i;step++) {
+            tbl[i] += (tbl[i-step] && max_advance_steps[i-step] >=step);
+            //std::cout<<"0 to "<<i <<" through "<< i-step << " reachable: "<<tbl[i] << std::endl;
+        }
+            
+    return tbl[max_advance_steps.size()-1];
 
 }
 
