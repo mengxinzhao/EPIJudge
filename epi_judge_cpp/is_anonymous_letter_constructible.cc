@@ -5,21 +5,23 @@ using std::string;
 using std::unordered_map;
 
 // map each char to its frequency
-// O(N+M+m) complexity N : letter_text length, M magzine_test length, m letter_freq length
+// O(N+M) complexity N : letter_text length, M magzine_test length
 bool IsLetterConstructibleFromMagazine(const string& letter_text,
                                        const string& magazine_text) {
-    unordered_map<char, int> letter_freq;
+
     unordered_map<char, int> magazine_freq;
-    for (const auto &ch: letter_text){
-        letter_freq[ch]++;
-    }
     for (const auto &ch: magazine_text){
         magazine_freq[ch]++;
     }
-    for (const auto &iter: letter_freq) {
-        if (magazine_freq.find(iter.first) == magazine_freq.end() || iter.second > magazine_freq[iter.first])
+    
+    for (const auto &ch: letter_text){
+        if (magazine_freq.find(ch) == magazine_freq.end())
+            return false;
+        magazine_freq[ch]--;
+        if (magazine_freq[ch] < 0)
             return false;
     }
+    
   return true;
 }
 
