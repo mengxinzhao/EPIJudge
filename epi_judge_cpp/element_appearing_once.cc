@@ -1,23 +1,30 @@
 #include <vector>
 #include <unordered_map>
-
+#include <iostream>
 using std::vector;
 using std::unordered_map;
 
-// O(N+m) complexity
-// N size of A, m size of unique element in A
+// O(N) complexity
+// O(3) space
+// bitwise XOR
+// code taken from http://www.crazyforcode.com/find-element-appears/
+// difficult to think of such solutions
 int FindElementAppearsOnce(const vector<int>& A) {
-    unordered_map<int, vector<int>> tbl;
+    int ones = 0, twos = 0, not_threes = 0;
+    // ones: mask of all element appearing one times
+    // twos: mask of all element appearing two times
     
     for (int i=0; i < A.size();i++) {
-        tbl[A[i]].push_back(i);
+        twos |= ones & A[i];
+        ones^=A[i];
+        
+        not_threes = ~(ones & twos) ;
+        ones &= not_threes ;//remove x from ones
+        twos &= not_threes ;//remove x from twos
+
     }
-    
-    for (const  auto &iter: tbl ) {
-        if (iter.second.size()==1)
-            return iter.first;
-    }
-    return 0;
+
+    return ones;
 }
 
 #include "test_framework/test_utils_generic_main.h"
