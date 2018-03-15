@@ -15,11 +15,12 @@ struct Compare {
     bool operator() (pair<size_t, int> &one ,pair<size_t, int> &two) {
         return one.first < two.first;
     }
-}compare_hush;
+}compare_hash;
 
 // sort the string and then hash
 // tbl lbt will have the same sorted value blt
-size_t HushString (string item ){
+// O(nlogn) for each string
+size_t HashString (string item ){
     size_t result = 0UL;
     string & str = item;
     std::sort(str.begin(),str.end());
@@ -27,15 +28,19 @@ size_t HushString (string item ){
     return result;
 }
 
+// O(NNLog(M)) complexity
+// N num_of_string
+// M string length
 
 vector<vector<string>> FindAnagrams( const vector<string>& dictionary) {
-    unordered_map<size_t, vector<int>> tbl;   // map hush back to index
+    unordered_map<size_t, vector<int>> tbl;   // map hash back to index
     vector<vector<string>> result;
+
     for (size_t len = 0; len < dictionary.size();len++) {
-        size_t val = HushString(dictionary[len]);
+        size_t val = HashString(dictionary[len]);
         tbl[val].push_back(len);
     }
-    
+
     for (auto &iter: tbl) {
         if (iter.second.size()>=2){
             vector<string> current;
