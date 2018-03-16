@@ -1,25 +1,78 @@
 #include <vector>
-
+#include <unordered_map>
+#include <list>
+#include <deque>
+#include <utility>
+#include <algorithm>
+#include <iostream>
 #include "test_framework/test_failure_exception.h"
 #include "test_framework/test_utils_serialization_traits.h"
 
+
+using std::unordered_map;
+using std::pair;
+using std::list;
+
+
+
+// O(1) look up time
+// O(1) insert
 class LruCache {
- public:
-  LruCache(size_t capacity) {}
+    list<int> dq; // double ended queue storing price to provide eviction candidate
+    unordered_map<int,list<int>::iterator > cache;  // map isbn to price
+    size_t cache_size = 0;
+public:
+    LruCache(size_t capacity):cache_size(capacity){};
 
   int Lookup(int isbn) {
-    // Implement this placeholder.
-    return 0;
+      unordered_map<int, list<int>::iterator >::iterator iter = cache.find(isbn);
+      if (iter!=cache.end()) {
+          // a cache hit
+          // move the hit  to the front of the list
+          std::cout<<isbn <<" cache hit "<< iter->first<<std::endl;
+          int updated_price = *iter->second;
+          dq.erase(iter->second);
+          dq.insert(dq.begin(),updated_price);
+          cache[isbn] = dq.begin();
+          return updated_price;
+      }
+    return -1;
   }
 
   void Insert(int isbn, int price) {
-    // Implement this placeholder.
-    return;
+    // check if the size is full
+      if (cache.size() == cache_size) {
+          // evict an entry
+          auto dq_iter = dq.end();
+          // possible to do O(1)?
+          for (auto iter = cache.begin(); iter!=cache.end();iter++) {
+              if (iter->second == dq_iter) {
+                  std::cout<<"evict "<< iter->first << ", " << *iter->second << std::endl;
+                  cache.erase(iter);
+                  break;
+              }
+          }
+          dq.pop_back();
+      }
+      // insert
+      std::cout<<"inserting "<< isbn <<"," << price<<std::endl;
+      dq.insert(dq.begin(),price);
+      cache[isbn] = dq.begin();
+      for (auto &iter: dq) {
+          std::cout<<iter << " ";
+      }
+      std::cout<<std::endl;
+      return;
   }
 
   bool Erase(int isbn) {
-    // Implement this placeholder.
-    return true;
+      const auto &iter = cache.find(isbn);
+      if (iter!=cache.end()) {
+          dq.erase(iter->second);
+          cache.erase(iter);
+          return true;
+      }
+    return false;
   }
 };
 
