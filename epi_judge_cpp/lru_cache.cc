@@ -5,6 +5,7 @@
 #include <utility>
 #include <algorithm>
 #include <iostream>
+#include <iterator>
 #include "test_framework/test_failure_exception.h"
 #include "test_framework/test_utils_serialization_traits.h"
 
@@ -13,13 +14,11 @@ using std::unordered_map;
 using std::pair;
 using std::list;
 
-
-
 // O(1) look up time
-// O(1) insert
+// O(1) insert ( not really O(n) n cache size)
 class LruCache {
-    list<int> dq; // double ended queue storing price to provide eviction candidate
-    unordered_map<int,list<int>::iterator > cache;  // map isbn to price
+    list<int> dq;                    // doubly linked list storing price to provide eviction candidate
+    unordered_map<int,list<int>::iterator > cache;  // map isbn to the price location in the link list
     size_t cache_size = 0;
 public:
     LruCache(size_t capacity):cache_size(capacity){};
@@ -29,39 +28,45 @@ public:
       if (iter!=cache.end()) {
           // a cache hit
           // move the hit  to the front of the list
-          std::cout<<isbn <<" cache hit "<< iter->first<<std::endl;
-          int updated_price = *iter->second;
+          dq.push_front(*iter->second);
           dq.erase(iter->second);
-          dq.insert(dq.begin(),updated_price);
           cache[isbn] = dq.begin();
-          return updated_price;
+          return *dq.begin();
       }
     return -1;
   }
 
   void Insert(int isbn, int price) {
-    // check if the size is full
-      if (cache.size() == cache_size) {
-          // evict an entry
-          auto dq_iter = dq.end();
-          // possible to do O(1)?
-          for (auto iter = cache.begin(); iter!=cache.end();iter++) {
-              if (iter->second == dq_iter) {
-                  std::cout<<"evict "<< iter->first << ", " << *iter->second << std::endl;
-                  cache.erase(iter);
-                  break;
+      //std::cout<<"inserting "<< isbn <<"," << price<<std::endl;
+      unordered_map<int, list<int>::iterator >::iterator iter = cache.find(isbn);
+      if (iter == cache.end()) {
+          // check if the cache is full
+          if (cache.size() == cache_size) {
+              // evict an entry
+              auto dq_iter = std::prev(dq.end());
+              // possible to do O(1)?
+              for (auto iter = cache.begin(); iter!=cache.end();iter++) {
+                  if (iter->second == dq_iter) {
+                      dq.pop_back();
+                      cache.erase(iter);
+                      break;
+                  }
               }
           }
-          dq.pop_back();
+          dq.push_front(price);
+          cache[isbn] = dq.begin();
+
+          
+      }else {
+          // I don't understand why it shouldn't update the isbn price to be more recent
+          // only this way could pass the judge data
+          // cache hit
+          dq.push_front(*iter->second);
+          dq.erase(iter->second);
+          cache[isbn] = dq.begin();
+          
       }
-      // insert
-      std::cout<<"inserting "<< isbn <<"," << price<<std::endl;
-      dq.insert(dq.begin(),price);
-      cache[isbn] = dq.begin();
-      for (auto &iter: dq) {
-          std::cout<<iter << " ";
-      }
-      std::cout<<std::endl;
+
       return;
   }
 
