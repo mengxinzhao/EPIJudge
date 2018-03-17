@@ -19,14 +19,20 @@ void GetValidIpAddressHelper (const string &s, vector<string> & result,
         // from start of the string, grab a validated IP part, insert a dot
         // append to the current
         int _start =start, _end = _start ;
-
-        while(s.begin()+_end != s.end()&& 255>=stoi(string(s.begin()+_start, s.begin()+_end+1))) {
-            string _current(current);
-            _current.insert(_current.end(), s.begin()+_start, s.begin()+_end+1);
-            if (num_parts<3)
-                _current.insert(_current.end(),'.');
-            //std::cout<<current<<std::endl;
-            GetValidIpAddressHelper(s, result,_end+1,num_parts+1,_current);
+        while(s.begin()+_end != s.end()) {
+            int digit = stoi(string(s.begin()+_start, s.begin()+_end+1));
+            if (digit <= 255 ) {
+                string _current(current);
+                if (digit == 0)
+                    _current.insert(_current.end(),'0');
+                else
+                    _current.insert(_current.end(), s.begin()+_start, s.begin()+_end+1);
+                if (num_parts<3)
+                    _current.insert(_current.end(),'.');
+                std::cout<<current<<std::endl;
+                GetValidIpAddressHelper(s, result,_end+1,num_parts+1,_current);
+            }else
+                break;
             _end++;
         }
     }
