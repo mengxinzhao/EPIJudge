@@ -8,31 +8,31 @@ using std::string;
 using std::vector;
 using std::stoi;
 
+//
 void GetValidIpAddressHelper (const string &s, vector<string> & result,
                               int start, int num_parts, string current ) {
 
-    if (start == s.length() && num_parts == 4) {
+    if (start == s.length() && num_parts >= 4) {
         result.push_back(current);
     }else if (start < s.length() && num_parts >=4 )
         return;
     else {
-        // from start of the string, grab a validated IP part, insert a dot
+        // from start of the string, grab a valid IP part, insert a dot
         // append to the current
         int _start =start, _end = _start ;
-        while(s.begin()+_end != s.end()) {
-            int digit = stoi(string(s.begin()+_start, s.begin()+_end+1));
-            if (digit <= 255 ) {
-                string _current(current);
-                if (digit == 0)
-                    _current.insert(_current.end(),'0');
-                else
-                    _current.insert(_current.end(), s.begin()+_start, s.begin()+_end+1);
-                if (num_parts<3)
-                    _current.insert(_current.end(),'.');
-                std::cout<<current<<std::endl;
-                GetValidIpAddressHelper(s, result,_end+1,num_parts+1,_current);
-            }else
-                break;
+        while(s.begin()+_end != s.end()&& 255>=stoi(string(s.begin()+_start, s.begin()+_end+1))) {
+            string _current(current);
+            // judge data forbids such address '000', '03'. 0 as prefix
+            // "00", "000", "01", etc. are not valid, but "0" is valid.
+            if (s[_start] == '0' && _end > _start) {
+                _end++;
+                continue;
+            }
+            _current.insert(_current.end(), s.begin()+_start, s.begin()+_end+1);
+            if (num_parts<3)
+                _current.insert(_current.end(),'.');
+            //std::cout<<current<<std::endl;
+            GetValidIpAddressHelper(s, result,_end+1,num_parts+1,_current);
             _end++;
         }
     }
