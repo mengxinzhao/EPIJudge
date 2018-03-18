@@ -1,4 +1,7 @@
 #include <memory>
+#include <unordered_set>
+
+using std::unordered_set;
 
 #include "binary_tree_with_parent_prototype.h"
 #include "test_framework/binary_tree_utils.h"
@@ -7,10 +10,30 @@
 
 using std::unique_ptr;
 
+// track the path in set
+// O(d) d: distance from  the deepest node  to the LCA
+// worst time and space: O(h) if two nodes are equally deep h: distance from the node to LCA
 BinaryTreeNode<int>* LCA(const unique_ptr<BinaryTreeNode<int>>& node0,
                          const unique_ptr<BinaryTreeNode<int>>& node1) {
-  // Implement this placeholder.
-  return nullptr;
+    unordered_set<BinaryTreeNode<int> *> tracks;
+    BinaryTreeNode<int> * p0 = node0.get();
+    BinaryTreeNode<int> * p1 = node1.get();
+    while(p0 || p1) {
+        if (p0 != nullptr && tracks.find(p0)!=tracks.end())
+            return p0;
+        else
+            tracks.emplace(p0);
+        if (p1 != nullptr && tracks.find(p1)!=tracks.end())
+            return p1;
+        else
+            tracks.emplace(p1);
+        if (p0!=nullptr)
+            p0 = p0->parent;
+        if (p1 != nullptr)
+            p1 = p1->parent;
+        
+    }
+    return nullptr;
 }
 
 int LcaWrapper(TestTimer& timer, const unique_ptr<BinaryTreeNode<int>>& tree,
