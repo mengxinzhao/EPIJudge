@@ -1,5 +1,5 @@
 #include <vector>
-
+#include <iostream>
 #include "test_framework/test_utils_serialization_traits.h"
 
 using std::vector;
@@ -8,9 +8,17 @@ struct DuplicateAndMissing {
   int duplicate, missing;
 };
 
+// sum(A)= sum(Z)+ d -m
+// square_sum(A) = square_sum(Z) + d^d - m^m
+// d + m = (square_sum(A) - square_sum(Z))/(sum(A) - sum(Z))
 DuplicateAndMissing FindDuplicateMissing(const vector<int>& A) {
-  // Implement this placeholder.
-  return {0, 0};
+    int sum=0, square_sum =0;
+    for (int i=0;i < A.size();i++) {
+        sum += A[i]-i;
+        square_sum +=  A[i]*A[i]-i*i;
+    }
+
+  return {(square_sum / sum + sum)/2, (square_sum / sum - sum)/2 };
 }
 
 template <>
