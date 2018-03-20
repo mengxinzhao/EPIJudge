@@ -3,10 +3,9 @@
 #include <iostream>
 
 using std::vector;
-
+//O(n+m) n,m A,B's length
 vector<int> IntersectTwoSortedArrays(const vector<int>& A,
                                      const vector<int>& B) {
-  // Implement this placeholder.
   vector<int> val;
 	size_t i=0,j=0;
 	while (i < A.size() && j<B.size()) {
