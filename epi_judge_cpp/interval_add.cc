@@ -6,12 +6,47 @@ using std::vector;
 
 struct Interval {
   int left, right;
+    Interval(int _left, int _right):left(_left),right(_right) {}
 };
 
 vector<Interval> AddInterval(const vector<Interval>& disjoint_intervals,
                              Interval new_interval) {
-  // Implement this placeholder.
-  return {};
+    vector<int> start (disjoint_intervals.size()+1,0);
+    vector<int> finish(disjoint_intervals.size()+1,0);
+    vector<Interval> result;
+    int i=0;
+    while (i<disjoint_intervals.size()) {
+        start[i] = disjoint_intervals[i].left;
+        finish[i] = disjoint_intervals[i].right;
+        i++;
+    }
+    start[i] = new_interval.left;
+    finish[i] =new_interval.right;
+    
+    // sort 2 array and merge sort
+    sort(start.begin(),start.end());
+    sort(finish.begin(),finish.end());
+    int start_idx=0, finish_idx=0;
+    int overlaps = 0;
+    int left,right; // to track the new interval
+
+    while (start_idx < start.size() || finish_idx < finish.size() ) {
+        if (start_idx < start.size() && start[start_idx] <= finish[finish_idx]) {
+            if (overlaps==0)
+                left = start[start_idx];
+            overlaps++;
+            start_idx++;
+        }else {
+            if (overlaps-1==0)  {
+                right = finish[finish_idx];
+                result.emplace_back(Interval(left,right));
+            }
+            finish_idx++;
+            overlaps--;
+        }
+    }
+
+    return result;
 }
 
 template <>
