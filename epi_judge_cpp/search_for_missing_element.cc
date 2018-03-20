@@ -22,8 +22,8 @@ DuplicateAndMissing FindDuplicateMissing(const vector<int>& A) {
 }
 
 // using XOR
-// A:  0....d d ....N-1
-// Z:  0....d m ....N-1
+// A: 0....d d ....N-1
+// Z: 0....d m ....N-1
 // A xor Z = d xor m. we know d and m diff in those many bits. take lowest diff bit
 // use d xor m to scan through A. if d xor m & A[i] = 1 A[i] bit is  set else cleared. this splits A into 2 parts [the numbers who has the same bit set, the numbers who has the same bit clean]
 // same as Z.
@@ -44,9 +44,9 @@ DuplicateAndMissing FindDuplicateMissing2(const vector<int>& A) {
     //final pass through A. if set xor A[i] == 0 the dup is found else set is the missing
     for (int i=0; i< A.size();i++){
         if ((A[i] ^ set) == 0)
-            return {set , set xor d_xor_m};
+            return {set , set ^ d_xor_m};
     }
-    return {d_xor_m xor set,set};
+    return {d_xor_m ^ set,set};
     
 }
 
