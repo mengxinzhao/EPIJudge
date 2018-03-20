@@ -4,7 +4,6 @@ using std::vector;
 
 // this is O(n) solution
 int SearchFirstOfK(const vector<int>& A, int k) {
-  // Implement this placeholder.
 	for (int i=0;i<A.size();i++) {
 		if (A[i] == k)
 			return i;
@@ -21,11 +20,11 @@ int  SearchFirstOfK_BST(const vector<int> &A, int k) {
 		// assume (right-left) will not overflow. The tree is not super huge
 		mid = left + (right-left)/2;
 		if (A[mid] > k)
-				right = mid-1;
+            right = mid-1;
 		else if (A[mid] == k)
-				break;
+            break;
 		else
-			left = mid + 1 ;
+            left = mid + 1 ;
 	}
 	if (left > right)
 		return -1;
