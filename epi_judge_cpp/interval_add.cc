@@ -6,7 +6,7 @@ using std::vector;
 
 struct Interval {
   int left, right;
-    Interval(int _left, int _right):left(_left),right(_right) {}
+  Interval(int _left, int _right):left(_left),right(_right) {}
 };
 
 vector<Interval> AddInterval(const vector<Interval>& disjoint_intervals,
@@ -30,6 +30,8 @@ vector<Interval> AddInterval(const vector<Interval>& disjoint_intervals,
     int overlaps = 0;
     int left,right; // to track the new interval
 
+    // whem overlaps count reaches from 0--> local peak-->back to 0
+    // that is a disjoint interval
     while (start_idx < start.size() || finish_idx < finish.size() ) {
         if (start_idx < start.size() && start[start_idx] <= finish[finish_idx]) {
             if (overlaps==0)
@@ -39,7 +41,7 @@ vector<Interval> AddInterval(const vector<Interval>& disjoint_intervals,
         }else {
             if (overlaps-1==0)  {
                 right = finish[finish_idx];
-                result.emplace_back(Interval(left,right));
+                result.emplace_back(left,right);
             }
             finish_idx++;
             overlaps--;
