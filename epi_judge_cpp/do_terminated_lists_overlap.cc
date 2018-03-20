@@ -8,8 +8,6 @@ using std::shared_ptr;
 
 shared_ptr<ListNode<int>> OverlappingNoCycleLists(
 				shared_ptr<ListNode<int>> l0, shared_ptr<ListNode<int>> l1) {
-	// Implement this placeholder.
-	// Implement this placeholder.
 	// sanity check
 	if (l0 == nullptr || l1 == nullptr)
 		return nullptr;
