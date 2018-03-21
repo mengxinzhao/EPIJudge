@@ -1,10 +1,12 @@
 #include <vector>
-
+#include <iostream>
 #include "test_framework/test_timer.h"
 #include "test_framework/test_utils_serialization_traits.h"
 
 using std::vector;
 using std::sort;
+using std::min;
+using std::max;
 
 
 struct Interval {
@@ -12,60 +14,54 @@ struct Interval {
         bool is_closed;
         int val;
         Endpoint(bool _closed,int _val):is_closed(_closed),val(_val) {}
-        Endpoint() {
-            is_closed = false;
-            val =0;
-        }
         bool operator<(const Endpoint &lh) const {
-            return (val < lh.val);
+            if (val < lh.val)
+                return true;
+            // [ < (
+            else if (val == lh.val && is_closed == true && lh.is_closed != true)
+                return true;
+            else
+                return false;
+        }
+        bool operator==(const Endpoint &lh) const {
+            return (val == lh.val)&& (is_closed == lh.is_closed);
         }
         bool operator<=(const Endpoint &lh) const {
             return (val <= lh.val);
         }
-        bool operator==(const Endpoint &lh) const {
-            return (val == lh.val) && (is_closed == lh.is_closed);
-        }
+
     };
     Endpoint left, right;
     Interval(Endpoint _left, Endpoint _right): left(_left),right(_right){}
+    bool operator<(const Interval &lh) const {
+        return (left < lh.left) ;
+    }
 };
 
+// O(Nlog(N)) complexity
 vector<Interval> UnionOfIntervals(vector<Interval> intervals) {
-    vector<Interval:: Endpoint> left_points;
-    vector<Interval:: Endpoint> right_points;
+
     vector<Interval> result;
-    for (int i=0; i< intervals.size();i++) {
-        left_points.push_back(intervals[i].left);
-        right_points.push_back(intervals[i].right);
-    }
+    sort(intervals.begin(), intervals.end());
+    
+    //merge one by one to a bigger interval
+    Interval merged = intervals[0];
+    for (int i=1; i< intervals.size();i++) {
 
-    sort(left_points.begin(),left_points.end());
-    sort(right_points.begin(),right_points.end());
-
-    Interval::Endpoint left(false,0),right(false,0);
-    int left_idx= 0, right_idx= 0;
-    int overlaps = 0;
-
-    while(left_idx < left_points.size() || right_idx  < right_points.size()) {
-        if (left_idx < left_points.size() && left_points[left_idx]<=right_points[right_idx] ) {
-            if (overlaps ==0) {
-                left = left_points[left_idx];
-                overlaps++;
-            }else if (left.is_closed == false && left_points[left_idx].is_closed == true)
-                left.is_closed = true;
-            left_idx++;
-        } else {
-            if (overlaps - 1 ==0) {
-                right = right_points[right_idx];
-                result.emplace_back(left,right);
-                overlaps--;
-            }else if (overlaps==0 && right.is_closed == false && right_points[right_idx].is_closed == true) {
-                result[result.size()-1].right.is_closed = true;
-            }
-            right_idx++;
+        if (intervals[i].left.val < merged.right.val
+            ||(intervals[i].left.val == merged.right.val
+               && (intervals[i].left.is_closed| merged.right.is_closed))) {
+            if ((merged.right.val < intervals[i].right.val )||
+                ((merged.right.val ==intervals[i].right.val) && intervals[i].right.is_closed))
+                merged.right =  intervals[i].right;
+        }else {
+            result.push_back(merged);
+            merged = intervals[i];
         }
     }
-  return result;
+    // the last merge
+    result.push_back(merged);
+    return result;
 }
 
 struct FlatInterval {
