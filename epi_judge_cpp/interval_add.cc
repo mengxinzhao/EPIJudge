@@ -3,12 +3,15 @@
 #include "test_framework/test_utils_serialization_traits.h"
 
 using std::vector;
+using std::min;
+using std::max;
 
 struct Interval {
   int left, right;
   Interval(int _left, int _right):left(_left),right(_right) {}
 };
 
+// O(NLogN) complexity
 vector<Interval> AddInterval(const vector<Interval>& disjoint_intervals,
                              Interval new_interval) {
     vector<int> start (disjoint_intervals.size()+1,0);
@@ -30,7 +33,7 @@ vector<Interval> AddInterval(const vector<Interval>& disjoint_intervals,
     int overlaps = 0;
     int left,right; // to track the new interval
 
-    // whem overlaps count reaches from 0--> local peak-->back to 0
+    // when overlaps count reaches from 0--> local peak-->back to 0
     // that is a disjoint interval
     while (start_idx < start.size() || finish_idx < finish.size() ) {
         if (start_idx < start.size() && start[start_idx] <= finish[finish_idx]) {
@@ -51,6 +54,35 @@ vector<Interval> AddInterval(const vector<Interval>& disjoint_intervals,
     return result;
 }
 
+// explore the fact that disjoint_intervals is already sorted.
+// iterate through disjoint_intervals and only update the intervals that overlap with the
+// newly added one
+// O(n) runing time
+vector<Interval> AddInterval2(const vector<Interval>& disjoint_intervals,
+                             Interval new_interval) {
+    vector<Interval> result;
+    int i=0;
+
+    while(i < disjoint_intervals.size()&& new_interval.left > disjoint_intervals[i].right) {
+        result.emplace_back(disjoint_intervals[i]);
+        i++;
+    }
+    
+    // update the intervals. If there is overlap,the new one is [min(new_left, left), max(new_right, right)]
+    while( i < disjoint_intervals.size() && new_interval.right >= disjoint_intervals[i].left) {
+        new_interval = {min(new_interval.left, disjoint_intervals[i].left),
+            max(new_interval.right, disjoint_intervals[i].right)};
+        i++;
+    }
+    result.emplace_back(new_interval);
+    
+    // the rest from disjoint_intervals are untouched
+    result.insert(result.end(), disjoint_intervals.begin()+i, disjoint_intervals.end());
+    return result;
+}
+
+
+
 template <>
 struct SerializationTraits<Interval> : UserSerTraits<Interval, int, int> {};
 
@@ -66,6 +98,6 @@ std::ostream& operator<<(std::ostream& out, const Interval& i) {
 
 int main(int argc, char* argv[]) {
   std::vector<std::string> param_names{"disjoint_intervals", "new_interval"};
-  generic_test_main(argc, argv, param_names, "interval_add.tsv", &AddInterval);
+  generic_test_main(argc, argv, param_names, "interval_add.tsv", &AddInterval2);
   return 0;
 }
