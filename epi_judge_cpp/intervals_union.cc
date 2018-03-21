@@ -4,19 +4,68 @@
 #include "test_framework/test_utils_serialization_traits.h"
 
 using std::vector;
+using std::sort;
+
 
 struct Interval {
-  struct Endpoint {
-    bool is_closed;
-    int val;
-  };
-
-  Endpoint left, right;
+    struct Endpoint {
+        bool is_closed;
+        int val;
+        Endpoint(bool _closed,int _val):is_closed(_closed),val(_val) {}
+        Endpoint() {
+            is_closed = false;
+            val =0;
+        }
+        bool operator<(const Endpoint &lh) const {
+            return (val < lh.val);
+        }
+        bool operator<=(const Endpoint &lh) const {
+            return (val <= lh.val);
+        }
+        bool operator==(const Endpoint &lh) const {
+            return (val == lh.val) && (is_closed == lh.is_closed);
+        }
+    };
+    Endpoint left, right;
+    Interval(Endpoint _left, Endpoint _right): left(_left),right(_right){}
 };
 
 vector<Interval> UnionOfIntervals(vector<Interval> intervals) {
-  // Implement this placeholder.
-  return {};
+    vector<Interval:: Endpoint> left_points;
+    vector<Interval:: Endpoint> right_points;
+    vector<Interval> result;
+    for (int i=0; i< intervals.size();i++) {
+        left_points.push_back(intervals[i].left);
+        right_points.push_back(intervals[i].right);
+    }
+
+    sort(left_points.begin(),left_points.end());
+    sort(right_points.begin(),right_points.end());
+
+    Interval::Endpoint left(false,0),right(false,0);
+    int left_idx= 0, right_idx= 0;
+    int overlaps = 0;
+
+    while(left_idx < left_points.size() || right_idx  < right_points.size()) {
+        if (left_idx < left_points.size() && left_points[left_idx]<=right_points[right_idx] ) {
+            if (overlaps ==0) {
+                left = left_points[left_idx];
+                overlaps++;
+            }else if (left.is_closed == false && left_points[left_idx].is_closed == true)
+                left.is_closed = true;
+            left_idx++;
+        } else {
+            if (overlaps - 1 ==0) {
+                right = right_points[right_idx];
+                result.emplace_back(left,right);
+                overlaps--;
+            }else if (overlaps==0 && right.is_closed == false && right_points[right_idx].is_closed == true) {
+                result[result.size()-1].right.is_closed = true;
+            }
+            right_idx++;
+        }
+    }
+  return result;
 }
 
 struct FlatInterval {
