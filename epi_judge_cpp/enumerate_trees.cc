@@ -1,15 +1,37 @@
 #include <algorithm>
 #include <stack>
 #include <vector>
+#include <iostream>
 
 #include "binary_tree_node.h"
 #include "test_framework/test_timer.h"
 
 using std::vector;
+using std::make_unique;
+// again a catalan number question
+// C(0)=1, C(n+1)= sum[ C(i)C(n-i)] from i=0,n n>=0
+// recursively allocate i nodes on the left and n-i-1 nodes on the right
+vector<unique_ptr<BinaryTreeNode<int>>> GenerateAllBinaryTreesHelper(int start,int end) {
+    vector<unique_ptr<BinaryTreeNode<int>>> result;
+    if (start >end) {
+        result.emplace_back(nullptr);
+    }else {
+        for (int i=start;i<=end;i++) {
+            auto left_trees = GenerateAllBinaryTreesHelper(start,i-1);
+            auto right_trees = GenerateAllBinaryTreesHelper(i+1, end);
+            for (auto &left_tree: left_trees)
+                for (auto &right_tree : right_trees)
+                    result.emplace_back(new BinaryTreeNode<int>(i,move(left_tree),move(right_tree)));
+        }
+    }
+    return result;
+}
+
 
 vector<unique_ptr<BinaryTreeNode<int>>> GenerateAllBinaryTrees(int num_nodes) {
-  // Implement this placeholder.
-  return {};
+  auto result= GenerateAllBinaryTreesHelper(0,num_nodes-1);
+    std::cout<<"tree size: "<<result.size()<<std::endl;
+    return result;
 }
 
 vector<int> SerializeStructure(const unique_ptr<BinaryTreeNode<int>>& tree) {
