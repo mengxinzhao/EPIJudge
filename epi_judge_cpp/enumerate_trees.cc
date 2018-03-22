@@ -9,19 +9,23 @@
 using std::vector;
 using std::make_unique;
 // again a catalan number question
-// C(0)=1, C(n+1)= sum[ C(i)C(n-i)] from i=0,n n>=0
+// C(0)=1, C(n)= sum[ C(i)C(n-i-1)] from i=0...n-1
 // recursively allocate i nodes on the left and n-i-1 nodes on the right
-vector<unique_ptr<BinaryTreeNode<int>>> GenerateAllBinaryTreesHelper(int start,int end) {
+
+vector<unique_ptr<BinaryTreeNode<int>>> GenerateAllBinaryTreesHelper(int num_nodes) {
     vector<unique_ptr<BinaryTreeNode<int>>> result;
-    if (start >end) {
+    //std::cout<<"num_nodes: "<<num_nodes<<std::endl;
+    if (num_nodes ==0) {
         result.emplace_back(nullptr);
     }else {
-        for (int i=start;i<=end;i++) {
-            auto left_trees = GenerateAllBinaryTreesHelper(start,i-1);
-            auto right_trees = GenerateAllBinaryTreesHelper(i+1, end);
+        for (int i=0;i<=num_nodes-1;i++) {
+            //std::cout<<"left: "<<i << " right: " <<num_nodes-1-i<<std::endl;
+            auto left_trees = GenerateAllBinaryTreesHelper(i);
+            auto right_trees = GenerateAllBinaryTreesHelper(num_nodes-1-i);
             for (auto &left_tree: left_trees)
-                for (auto &right_tree : right_trees)
+                for (auto &right_tree : right_trees){
                     result.emplace_back(new BinaryTreeNode<int>(i,move(left_tree),move(right_tree)));
+                }
         }
     }
     return result;
@@ -29,7 +33,7 @@ vector<unique_ptr<BinaryTreeNode<int>>> GenerateAllBinaryTreesHelper(int start,i
 
 
 vector<unique_ptr<BinaryTreeNode<int>>> GenerateAllBinaryTrees(int num_nodes) {
-  auto result= GenerateAllBinaryTreesHelper(0,num_nodes-1);
+  auto result= GenerateAllBinaryTreesHelper(num_nodes);
     std::cout<<"tree size: "<<result.size()<<std::endl;
     return result;
 }
