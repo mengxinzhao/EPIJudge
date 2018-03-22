@@ -8,9 +8,17 @@
 
 using std::vector;
 using std::make_unique;
+
 // again a catalan number question
 // C(0)=1, C(n)= sum[ C(i)C(n-i-1)] from i=0...n-1
 // recursively allocate i nodes on the left and n-i-1 nodes on the right
+
+// recursively copy all tree nodes
+unique_ptr<BinaryTreeNode<int>> Clone(const unique_ptr<BinaryTreeNode<int>>& tree) {
+    return tree ? make_unique<BinaryTreeNode<int>>(BinaryTreeNode<int>{
+        0, Clone(tree->left), Clone(tree->right)})
+    : nullptr;
+}
 
 vector<unique_ptr<BinaryTreeNode<int>>> GenerateAllBinaryTreesHelper(int num_nodes) {
     vector<unique_ptr<BinaryTreeNode<int>>> result;
@@ -24,7 +32,7 @@ vector<unique_ptr<BinaryTreeNode<int>>> GenerateAllBinaryTreesHelper(int num_nod
             auto right_trees = GenerateAllBinaryTreesHelper(num_nodes-1-i);
             for (auto &left_tree: left_trees)
                 for (auto &right_tree : right_trees){
-                    result.emplace_back(new BinaryTreeNode<int>(i,move(left_tree),move(right_tree)));
+                    result.emplace_back(new BinaryTreeNode<int>(i,Clone(left_tree),Clone(right_tree)));
                 }
         }
     }
