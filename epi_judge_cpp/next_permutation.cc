@@ -2,7 +2,7 @@
 #include <algorithm>
 
 using std::vector;
-
+using std::reverse;
 vector<int> NextPermutation(vector<int> perm) {
     int size = perm.size();
 
@@ -17,7 +17,7 @@ vector<int> NextPermutation(vector<int> perm) {
 	if (i <=0)
 		return {};
 	//search for the 1st element from the end to the pos that
-	// is bigger than perm[pos-1] swap_pos =3
+	// is bigger than perm[pos-1] swap_pos = 2
 	int swap_pos = 0;
 	for (int i=size-1; i >=pos;i--)
 		if (perm[i] > perm[pos-1]) {
@@ -26,10 +26,8 @@ vector<int> NextPermutation(vector<int> perm) {
 		}
 	std::swap(perm[pos-1],perm[swap_pos]);  //<3,5,4,2,1,0>
 	//reverse the array from the end to the pos  // <3,0,1,2,4,5>
-	for (int i = 0; i< (size -pos)/2;i++){
-		std::swap(perm[i+pos],perm[size-i-1]);
-	}
-
+    //to have the smallest permutation in dictionary order
+    reverse(perm.begin()+pos, perm.end());
     return perm;
 }
 
