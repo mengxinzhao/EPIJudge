@@ -4,7 +4,6 @@
 using std::vector;
 
 vector<int> NextPermutation(vector<int> perm) {
-	// Implement this placeholder.
     int size = perm.size();
 
 	int i=0, pos = 0;
