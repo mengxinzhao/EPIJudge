@@ -3,7 +3,6 @@
 using std::vector;
 
 void ApplyPermutation1(vector<int>* perm_ptr, vector<int>* A_ptr) {
-  // Implement this placeholder.
 	//not an efficient solution. Using extra room here to keep the copy
     vector<int> &v_a = *A_ptr;
 	vector<int > copy(v_a);
@@ -14,8 +13,9 @@ void ApplyPermutation1(vector<int>* perm_ptr, vector<int>* A_ptr) {
   return;
 }
 
+//O(n) run time complexity
+// constant space
 void ApplyPermutation2(vector<int>* perm_ptr, vector<int>* A_ptr) {
-	// Implement this placeholder.
 	// no extra room
 	vector<int> &v_a = *A_ptr;
 	vector<int> &v_p = *perm_ptr;
