@@ -5,20 +5,18 @@
 using std::vector;
 
 bool loc_exist(int curr_loc, int curr_row,vector<int>existing_loc) {
-    if (find(existing_loc.begin(),existing_loc.end(),curr_loc) != existing_loc.end())
-        return true;
-    else {
-        // check if it leads to a diagnal attacking position
-        for (int i=0;i<existing_loc.size();i++) {
-            if (std::abs(curr_loc - existing_loc[i]) == std::abs(curr_row-i))
-                return true;
-        }
-        
+    for (int i=0;i<existing_loc.size();i++) {
+        // diagnal attacking or the current loc exists in the existing loc already
+        if (std::abs(curr_loc - existing_loc[i]) == std::abs(curr_row-i)
+            ||std::abs(curr_loc - existing_loc[i])==0)
+            return true;
     }
+
     return false;
 }
 
 // kth row to be filled
+// number of recursion depends on run time. but I think somewhere O(n!/C)
 void NQueensHelper(vector<vector<int>> &result, vector<int>current, int k, int n) {
     if (k>=n ) {
         // have a solution
@@ -28,7 +26,7 @@ void NQueensHelper(vector<vector<int>> &result, vector<int>current, int k, int n
     }
     int curr_choice = current.back();
     for (int i=0;i<n;i++) {
-        vector<int> copy = current;
+        vector<int> copy(current);
         if (!loc_exist(i,k, copy)) {
             copy.push_back(i);
             NQueensHelper(result,copy,k+1,n);
