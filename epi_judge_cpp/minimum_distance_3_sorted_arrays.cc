@@ -55,6 +55,11 @@ int FindClosestElementsInSortedArrays(
         int next_idx = current.begin()->curr_idx;
         int end_idx = current.begin()->end_idx;
         next_idx++;
+        // when one array runs to the end exit
+        // if <i,j,k> is the min_distance identitified before j runs to the end(say j is B's idx)
+        // the triplet distance found after B.size()-1 can't be less than <i,j,k>
+        // because distance = max(distance_AB, distance_AC, distance_BC)
+        // now distance_AB, distance_BC will be no less than distance_A[i]B[j], distance_B[j]C[k]
         if (next_idx >= end_idx){
             //std::cout<<"min_distance: "<<min_distance<<std::endl;
             return min_distance;
