@@ -11,10 +11,14 @@ void print(vector<int> A) {
 	return ;
 }
 
+// run time complexity
+// T(m) = c+ (n-m-1)T(m+1)
+// T(0) = c+ (n-1)T(1) ~ O(n!)
+
 void nextPermutation(vector<int>A, int m, int n,vector<vector<int>> &result ) {
 	if (m == n) {
 		result.push_back(A);
-		print(A);
+		//print(A);
 		return ;
 	}
 	for (int i = m; i <= n;i++) {
@@ -25,8 +29,8 @@ void nextPermutation(vector<int>A, int m, int n,vector<vector<int>> &result ) {
 	}
 	return ;
 }
+
 vector<vector<int>> Permutations(vector<int> A) {
-  // Implement this placeholder.
   // permutate all elements in a A
   // array:  4 6 7
   // index:  0 1 2
@@ -49,19 +53,10 @@ vector<vector<int>> Permutations(vector<int> A) {
 }
 
 #include "test_framework/test_utils_generic_main.h"
-#if 0
 int main(int argc, char* argv[]) {
   std::vector<std::string> param_names{"A"};
   generic_test_main(argc, argv, param_names, "permutations.tsv", &Permutations,
                     &UnorderedComparator<vector<vector<int>>>);
   return 0;
 }
-#endif
-int main() {
-	vector<int> A;
-	A.push_back(4);
-	A.push_back(6);
-	A.push_back(7);
-	vector<vector<int> > result = Permutations(A);
-	return 0;
-}
+
