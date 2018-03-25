@@ -1,7 +1,11 @@
 #include <vector>
 #include <iostream>
+#include <algorithm>
+
 
 using std::vector;
+using std::next_permutation;
+using std::sort;
 
 #include <algorithm>
 void print(vector<int> A) {
@@ -52,6 +56,15 @@ vector<vector<int>> Permutations(vector<int> A) {
   return vals;
 }
 
+// use c++ API
+vector<vector<int>>Permutations2(vector<int> A) {
+    vector<vector<int>> result;
+    sort(A.begin(), A.end());
+    do {
+        result.push_back(A);
+    }while(next_permutation(A.begin(), A.end()));
+    return result;
+}
 #include "test_framework/test_utils_generic_main.h"
 int main(int argc, char* argv[]) {
   std::vector<std::string> param_names{"A"};
