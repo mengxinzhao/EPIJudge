@@ -7,11 +7,21 @@
 
 using std::unique_ptr;
 using std::vector;
+using std::make_unique;
+
+unique_ptr<BstNode<int>> BuildNode(const vector<int> &A, int left, int right){
+    if (left > right)
+        return nullptr;
+    int mid= left + (right - left)/2;
+    auto new_root = make_unique<BstNode<int>>(A[mid]);
+    new_root->left = BuildNode(A,left, mid-1);
+    new_root->right = BuildNode(A,mid+1, right);
+    return new_root;
+}
 
 unique_ptr<BstNode<int>> BuildMinHeightBSTFromSortedArray(
     const vector<int>& A) {
-  // Implement this placeholder.
-  return nullptr;
+    return BuildNode(A,0,A.size()-1);
 }
 
 int BuildMinHeightBSTFromSortedArrayWrapper(TestTimer& timer,
