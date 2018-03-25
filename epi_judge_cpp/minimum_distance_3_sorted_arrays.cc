@@ -3,78 +3,69 @@
 #include <algorithm>
 #include <utility>
 #include <iostream>
+#include <iterator>
+#include <map>
+#include <set>
 using std::vector;
 using std::priority_queue;
 using std::min;
 using std::tuple;
 using std::min_element;
-// merge sort the arrays
-// keep the max_heap size =3 that tracks the minimum distance
-// when all elements are visited
-// the last popped element in the max_heap is the minimum distance
+using std::multimap;
+using std::numeric_limits;
+using std::set;
 
-// O(Nlog(3)) complexity ~= O(N)
-// N: total length of the merged array
-// log(3) to insert an element into max_heap
-
+// set keeps unique element sorted.
+// when two values are the same need to choose the one
+// from the smaller idx array
 struct Record {
-    int distance;
-    tuple<int,int,int>loc;
-    Record(int _distance,tuple<int,int,int>_loc) : distance(_distance),loc(_loc) {}
+    Record(int _array_idx, int _curr_idx, int _end_idx,int _val):array_idx(_array_idx),curr_idx(_curr_idx),end_idx(_end_idx), val(_val) {}
+    bool operator < (const Record &lh) const {
+        return (val< lh.val || ((val == lh.val) && (array_idx < lh.array_idx)));
+    }
+    int array_idx;
+    int curr_idx;
+    int end_idx;
+    int val;
 };
 
-struct Compare {
-    bool operator() (const Record &lhs, const Record &rhs) const {
-        return lhs.distance < rhs.distance;
-    }
-};
+// merge sort the arrays by each time picking up the minium element from
+// A,B,C of current idx
+// the min distance comes from the smallest max distance of a triplet visited
 
-bool get_next_min(const vector<vector<int>>& sorted_arrays, vector<int> &Idx, int &next_min){
-    vector<int> tmp;
-    bool min_exist = false;
-    int min_idx = 0, max_idx = 0;
-    int min = INT_MAX,max = INT_MIN;
-    for (int i = 0; i< sorted_arrays.size();i++) {
-        if ( Idx[i] < sorted_arrays[i].size () )
-            tmp.push_back(sorted_arrays[i][Idx[i]]);
-        else
-            tmp.push_back(sorted_arrays[i][sorted_arrays[i].size()-1]);
-        if (Idx[i] < sorted_arrays[i].size () && min > sorted_arrays[i][Idx[i]]) {
-            min_exist = true;
-            min =sorted_arrays[i][Idx[i]];
-            min_idx = i;
-        }
-    }
-    if (min_exist) {
-        std::sort(tmp.begin(),tmp.end());
-        next_min = *std::prev(tmp.end()) - *tmp.begin();
-//        std::cout<<"min: "<<sorted_arrays[min_idx][Idx[min_idx]] <<std::endl;
-//        std::cout<<"next_min: "<<next_min<<std::endl;
-        Idx[min_idx]++;
-        return true;
-    }
-    else
-        return false;
-
-}
+// O(Nlog(k)) complexity ~= O(N)
+// N: total length of the merged array, k = 3 . set uses AVL tree the sorting O(klog(k))
 
 int FindClosestElementsInSortedArrays(
     const vector<vector<int>>& sorted_arrays) {
-    //max_heap
-    priority_queue<int, vector<int>, std::less<int>> tbl;
-    vector<int> Idx(sorted_arrays.size(),0);
-    int heap_size = sorted_arrays.size();
-    int min = INT_MAX;
-    while (get_next_min(sorted_arrays,Idx,min)) {
-        tbl.emplace(min);
-        if (tbl.size() > heap_size)
-            tbl.pop();
-    }
+    //use set to track. It is sorted by val
+    set<Record> current;
+    int min_distance = INT_MAX;
+    int max_distance  = INT_MIN;
     
-    while(tbl.size()>1)
-        tbl.pop();
-    return tbl.top();
+    //initial current track
+    for (int i=0;i<sorted_arrays.size();i++) {
+        current.emplace(i, 0,sorted_arrays[i].size(),sorted_arrays[i][0]);
+    }
+    while (true) {
+        max_distance = std::prev(current.end())->val -  current.begin()->val ;
+        min_distance = min(min_distance, max_distance);
+        //discard the minimum val element
+        int array_idx = current.begin()->array_idx;
+        int next_idx = current.begin()->curr_idx;
+        int end_idx = current.begin()->end_idx;
+        next_idx++;
+        if (next_idx >= end_idx){
+            //std::cout<<"min_distance: "<<min_distance<<std::endl;
+            return min_distance;
+        }
+        current.erase(current.begin());
+        current.emplace(array_idx,next_idx,end_idx,sorted_arrays[array_idx][next_idx]);
+    }
+
+    return min_distance;
 }
+
 
 #include "test_framework/test_utils_generic_main.h"
 
