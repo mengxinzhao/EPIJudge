@@ -30,7 +30,6 @@ void generateCombination(vector<vector<int>> &result,vector<int> input, vector<i
 }
 
 vector<vector<int>> Combinations(int n, int k) {
-  // Implement this placeholder.
 	if (k>n|| n<=0 || k<=0)
 		return {{}};
 	vector<vector<int> > results;
