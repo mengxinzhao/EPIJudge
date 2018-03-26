@@ -39,8 +39,8 @@ void generateSet(vector<vector<int>> &results,const vector<int> input_set,vector
 vector<vector<int>> GeneratePowerSet(const vector<int>& input_set) {
 	// set 4 5 6
     //     {}, {4},{5},{6}, {4,5}, {5,6}, {4,6}, {4,5,6}
-	//
-    vector<vector<int>> results = generate_set(input_set,input_set.size());
+    //
+    vector<vector<int>> results;
     if (input_set.empty())
         return {{}};
 
@@ -62,10 +62,11 @@ vector<vector<int>> GeneratePowerSet2(const vector<int>& input_set) {
     vector<vector<int>> result({{}});
     
     for (int i=1;i<=input_set.size();i++) {
-        subset = move(result);
+        //vector<vector<int>> subset = move(result);
+        vector<vector<int>> subset(result);
         for (int j=0; j< subset.size();j++) {
             // subset[i] = A[i] U subset[i-1]
-            result.push_back(subset[j]);
+            //result.push_back(subset[j]);
             subset[j].push_back(input_set[i-1]);
             result.push_back(subset[j]);
             
