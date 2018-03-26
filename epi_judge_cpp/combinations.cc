@@ -3,44 +3,33 @@
 
 using std::vector;
 
-void generateCombination(vector<vector<int>> &result,vector<int> input, vector<int> curr,
-                         int start_index,int bits_remain, bool chosen ) {
-	// curr: the curr result. can't use reference. otherwise the later result will mess up the previous result
-	// bits_remain: number of choice remaining from [start+1 , end]
-	//std::cout<<"start: "<<start_index<< " chosen " <<chosen<< " bits " << bits_remain <<std::endl;
-	if (bits_remain < 0 || start_index > input.size()-1)
-		return ;
-
-	else {
-		// choose the current bit.
-		if (chosen)
-			curr.push_back(input[start_index]);
-
-		if (bits_remain <= 0) {
-			result.push_back(curr);
-			return;
-		}
-		// choose start_index+1, and remaining bits_remain-1 from the rest
-		generateCombination(result, input, curr, start_index + 1, bits_remain-1, true);
-		// all  bits_remain from the rest
-		generateCombination(result, input, curr, start_index + 1, bits_remain, false);
-
-	}
+// C(n,i) = C(n-1,i) + C(n-1,i-1)
+// 2^(n-k) calls
+// O(2^n) complexity
+void CombinationsHelper(int n, int k, vector<vector<int>> &result, vector<int> curr, int start) {
+    if (curr.size()==k) {
+        result.push_back(curr);
+        return;
+    }
+    
+    //choose start, select k-1-curr.size() elements from start+1 to the end
+    if (k-curr.size() -1 <= n-start -1) {
+        curr.push_back(start+1);     // input range [1,...n] val = index+1
+        CombinationsHelper(n,k,result,curr, start+1);
+        curr.pop_back();
+    }
+    //do not choose start, select k-curr.size() elements from start+1 to the end
+    if (k-curr.size() <= n-start-1) {
+        CombinationsHelper(n,k,result,curr, start+1);
+    }
 
 }
 
 vector<vector<int>> Combinations(int n, int k) {
-	if (k>n|| n<=0 || k<=0)
-		return {{}};
-	vector<vector<int> > results;
-	vector<int> input, first({});
-	// have input
-	for (int i=1;i<=n;i++)
-		input.push_back(i);
-
-	generateCombination(results,input,first,0,k-1, true );  //first bit chosen, choose k-1 from the rest
-	generateCombination(results,input,first,0,k, false ); // first bit not chosen choose k from the rest
-  return results;
+    vector<vector<int> > result;
+    vector<int> curr;
+    CombinationsHelper(n,k,result,curr,0);
+    return result;
 }
 
 #include "test_framework/test_utils_generic_main.h"
