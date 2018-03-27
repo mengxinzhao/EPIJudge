@@ -1,15 +1,48 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <cmath>
+#include <iomanip>
+#include <iostream>
+#include <bitset>
 
 #include "test_framework/test_failure_exception.h"
 #include "test_framework/test_timer.h"
 
 using std::vector;
+using std::pow;
+
+bool DiffersByOneBit(int x, int y) ;
+bool Seen(vector<int>curr_solution, int code) {
+    for (int i=0; i< curr_solution.size();i++) {
+        if (curr_solution[i] == code)
+            return true;
+    }
+    return false;
+}
+
+void GrayCodeHelper(vector<int> &curr_solution, int num_bits) {
+    
+    if (curr_solution.size()== pow(2,num_bits)) {
+        return;
+        
+    }
+    int curr_code = curr_solution.back();
+    int next_code = curr_code;
+    //can flip num_bit one at a time
+    for (int i=0;i<num_bits;i++) {
+        next_code = curr_code ^ (1UL<<i);
+        if (DiffersByOneBit(next_code,curr_code) && !Seen(curr_solution, next_code) ) {
+            curr_solution.push_back(next_code);
+            GrayCodeHelper(curr_solution,num_bits);
+        }
+    }
+}
 
 vector<int> GrayCode(int num_bits) {
-  // Implement this placeholder.
-  return {};
+    vector<int> result({0});
+    GrayCodeHelper(result,num_bits);
+    return result;
 }
 
 bool DiffersByOneBit(int x, int y) {
