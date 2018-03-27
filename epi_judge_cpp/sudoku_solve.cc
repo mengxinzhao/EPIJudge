@@ -2,6 +2,7 @@
 #include <cmath>
 #include <iterator>
 #include <vector>
+#include <unordered_map>
 
 #include "test_framework/test_failure_exception.h"
 #include "test_framework/test_timer.h"
@@ -10,9 +11,62 @@ using std::begin;
 using std::end;
 using std::vector;
 
+bool find_unassigned_location(vector<vector<int>> *partial_assignment,int &row, int &col) {
+    for (row =0; row< (*partial_assignment).size();row++)
+        for (col = 0; col < (*partial_assignment)[row].size();col++)
+            if ((*partial_assignment)[row][col] == 0)
+                return true;
+    return false;
+}
+
+bool no_conflicts(vector<vector<int>> *partial_assignment, int row, int col, int num) {
+    // can't be appearing twice in a row, col or 3 x 3 box
+    
+    // check row
+    for(int i=0; i < (*partial_assignment).size();i++) {
+        if ((*partial_assignment)[i][col]!=0 && (*partial_assignment)[i][col]==num ) {
+                return false;
+        }
+    }
+
+    // check column
+    for(int i=0; i < (*partial_assignment)[row].size();i++) {
+        if ((*partial_assignment)[row][i]!=0 && (*partial_assignment)[row][i]==num ) {
+            return false;
+        }
+    }
+    
+    // check 3 x 3
+    int row_start = 3*(int)(row/3);
+    int column_start = 3 * (int)(col/3);
+    for (int i = row_start; i< row_start + 3; i++)
+        for (int j= column_start; j< column_start+3; j++) {
+            if ((*partial_assignment)[i][j] == num )
+                return false;
+        }
+    
+    return true;
+}
+//solve using materials https://see.stanford.edu/materials/icspacs106b/H19-RecBacktrackExamples.pdf
 bool SolveSudoku(vector<vector<int>>* partial_assignment) {
-  // Implement this placeholder.
-  return true;
+    int row, col;
+    // all filled. success
+    if (!find_unassigned_location(partial_assignment, row, col))
+        return true;
+    
+    for (int num=1; num<=9;num++) {
+        if (no_conflicts(partial_assignment, row,col, num)) {
+            // try one choice
+            (*partial_assignment)[row][col] = num;
+            // go on to the next location
+            if (SolveSudoku(partial_assignment))
+                return true;
+            // failure. backout assignment. try again
+            (*partial_assignment)[row][col] = 0;
+            
+        }
+    }
+    return false;   // this trigger failure and  back tracking
 }
 
 vector<int> GatherColumn(const vector<vector<int>>& data, size_t i) {
