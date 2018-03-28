@@ -12,76 +12,78 @@ struct Rectangle {
     int left, right, height;
     Rectangle(int _left,int _right, int _height):left(_left), right(_right),height(_height) {}
     bool operator < (const Rectangle &rhs) const {
-        return left<rhs.left;
+        return (left<rhs.left || (left == rhs.left && right < rhs.right));
     }
 };
 
-struct Compare {
-    bool operator() (const Rectangle &lh, const Rectangle &rh) const {
-        return lh.height < rh.height;
-    }
-};
 
 typedef vector<Rectangle> Skyline;
 
 // recursively merge the building contour of building left and building right
-Skyline merge(const vector<Rectangle> &buildings, int left,int right) {
-    if (left >= right)
+Skyline merge_skyline(const vector<Rectangle> &buildings, int left,int right) {
+    if (left == right)
         return vector<Rectangle>({buildings[left]});
     
     int mid = left + (right - left)/2;
-    Skyline skl_left = merge(buildings, left, mid);
-    Skyline skl_right = merge(buildings, mid+1, right);
+    Skyline skl_left = merge_skyline(buildings, left, mid);
+    Skyline skl_right = merge_skyline(buildings, mid+1, right);
     Skyline merged;
-    int i = 0, j=0;
-    // merge to union areas. At this point, all rectangles are already sorted by their left coordinates.
-    while (i <skl_left.size() && j < skl_right.size()) {
-//         std::cout<<"left: " <<skl_left[i].left<<", "<<skl_left[i].right<<", "<< skl_left[i].height<<std::endl;
-//         std::cout<<"right: " <<skl_right[j].left<<", "<<skl_right[j].right<<", "<< skl_right[j].height<<std::endl;
-        if (skl_left[i].right < skl_right[j].left){
-            merged.push_back(skl_left[i]);
-            i++;
-        }
-        // left rectangle x range doesn't over all right rectangle
-        else if (skl_left[i].right > skl_right[j].left && skl_left[i].right < skl_right[j].right ){
-            if (skl_left[i].height >skl_right[j].height) {
-                merged.emplace_back(skl_left[i].left,skl_left[i].right, skl_left[i].height);
-                merged.emplace_back(skl_left[i].right,skl_right[j].right, skl_right[j].height);
-            } else if (skl_left[i].height ==skl_right[j].height) {
-                merged.emplace_back(skl_left[i].left,skl_right[j].right, skl_left[i].height);
-            }else {
-                merged.emplace_back(skl_left[i].left,skl_right[j].left, skl_left[i].height);
-                merged.emplace_back(skl_right[j].left,skl_right[j].right, skl_right[j].height);
-            }
-            i++;
-            j++;
-        }else {
-            if (skl_left[i].height > skl_right[j].height)
-                merged.emplace_back(skl_left[i].left,skl_left[i].right, skl_left[i].height);
-            else if  (skl_left[i].height ==skl_right[j].height) {
-                merged.emplace_back(skl_left[i].left,skl_left[i].right, skl_left[i].height);
-            }else {
-                merged.emplace_back(skl_left[i].left,skl_right[j].left, skl_left[i].height);
-                merged.emplace_back(skl_right[j].left,skl_right[j].right, skl_right[j].height);
-                merged.emplace_back(skl_right[j].right,skl_left[i].right, skl_left[i].height);
-            }
-            j++;
-        }
-    }
-    if (i >=skl_left.size() && j< skl_right.size()) {
-        merged.emplace_back(skl_left[skl_left.size()-1].right+1,skl_right[j].left-1, 0);
-        while (j < skl_right.size()){
-            merged.push_back(skl_right[j]);
-            j++;
-        }
-    }
-//    if (i <  skl_left.size() && j>=skl_right.size()) {
-//        while (i < skl_left.size()) {
-//            merged.push_back(skl_left[i]);
-//            i++;
-//        }
-//    }
+    
+//    std::cout<<"left: " <<std::endl;
+//    for (int i= 0; i< skl_left.size();i++)
+//        std::cout<<"("<<skl_left[i].left<<", "<<skl_left[i].right<<", "<< skl_left[i].height<<") ";
+//    std::cout<<std::endl;
+//    std::cout<<"right: " <<std::endl;
+//    for (int i= 0; i< skl_right.size();i++)
+//        std::cout<<"("<<skl_right[i].left<<", "<<skl_right[i].right<<", "<< skl_right[i].height<<") ";
+//    std::cout<<std::endl;
+    
+    //left and right are not connected
+    if (skl_left[skl_left.size()-1].right < skl_right[0].left) {
+        merged.insert(merged.begin(),skl_left.begin(),skl_left.end());
+        merged.emplace_back(skl_left[skl_left.size()-1].right+1,skl_right[0].left-1,0);
+        merged.insert(merged.end(),skl_right.begin(),skl_right.end());
 
+//        for (int i= 0; i< merged.size();i++)
+//            std::cout<<"merged: " <<merged[i].left<<", "<<merged[i].right<<", "<< merged[i].height<<std::endl;
+        return merged;
+    }
+    
+    int i=0;
+    // merge left till the last rectange. The last one needs to be merged with right ones
+    merged.insert(merged.begin(),skl_left.begin(), std::prev(skl_left.end()));
+    Rectangle candidate = skl_left[skl_left.size()-1];
+    // take care of overlapping areas
+    while(i < skl_right.size()  && candidate.right > skl_right[i].right) {
+        if (candidate.height < skl_right[i].height ) {
+            merged.emplace_back(candidate.left,skl_right[i].left,candidate.height);
+            merged.push_back(skl_right[i]);
+            candidate.left = skl_right[i].right;
+        }
+        i++;
+    }
+    //
+    if (i>=skl_right.size()){
+        merged.push_back(candidate);
+    }
+    else {
+        if (candidate.height > skl_right[i].height) {
+            merged.push_back(candidate);
+            merged.emplace_back(candidate.right, skl_right[i].right, skl_right[i].height);
+        }else if (candidate.height == skl_right[i].height){
+            merged.emplace_back(candidate.left,skl_right[i].right,skl_right[i].height);
+        }else {
+            merged.emplace_back(candidate.left,skl_right[i].left,candidate.height);
+            merged.push_back(skl_right[i]);
+        }
+        // merge right
+        i++;
+        if (i<skl_right.size())
+            merged.insert(merged.end(),skl_right.begin()+i,skl_right.end());
+    }
+//    for (int i= 0; i< merged.size();i++)
+//        std::cout<<"merged: " <<merged[i].left<<", "<<merged[i].right<<", "<< merged[i].height<<std::endl;
+    
     return merged;
 }
 
@@ -91,7 +93,7 @@ Skyline ComputeSkyline(const vector<Rectangle>& buildings) {
     for (int i=0;i < blds.size();i++)
         std::cout<<"[ "<<blds[i].left<<", "<<blds[i].right<<", "<< blds[i].height<<"], ";
     std::cout<<std::endl;
-    Skyline merged = merge(blds,0,blds.size()-1);
+    Skyline merged = merge_skyline(blds,0,blds.size()-1);
     return merged;
 }
 
