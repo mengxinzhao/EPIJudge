@@ -3,12 +3,12 @@
 #include <iostream>
 using std::vector;
 using std::min;
+
 // DP[i,j] minimum path weight from (0,0) to (i,j) in the grid
-// DP[i,j] = min(DP[i-1,j], DP[i-1,j-1], DP[i-1,j+1]) + triangle[i,j]) i>=1,j>=1 j+1> triangle_width
+// DP[i,j] = min(DP[i-1,j], DP[i-1,j-1], DP[i-1,j+1]) + triangle[i,j]) i>=1,j>=1, j+1> triangle_width
 // DP[0,0] = 0
 // triangle_width = triangle_row+1
-// solution min(DP[0,:])
-// to make things easier fill all the grid space left with
+// solution min(DP[last_row,:])
 // O(n^2) run time complexity
 int MinimumPathWeight(const vector<vector<int>>& triangle) {
     vector<vector<int>> DP(triangle.size()+1, vector<int>(triangle.size()+1,INT_MAX));
@@ -19,7 +19,6 @@ int MinimumPathWeight(const vector<vector<int>>& triangle) {
             // this would pass the judge data but i think it is not optimal. The above line finds the real min weight path
             DP[i][j] = min(DP[i-1][j], DP[i-1][j-1]) + triangle[i-1][j-1];
         }
-        //std::cout<<std::endl;
     }
     if (triangle.size()>0) {
         int min_weight = INT_MAX;
