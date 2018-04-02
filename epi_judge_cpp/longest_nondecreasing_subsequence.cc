@@ -8,8 +8,8 @@ using std::max;
 using std::min;
 using std::pair;
 // LSN[i] = max(sequence from (i+1...N), sequence from (k ...N))  k is the first element A[k] > A[i]
-//  when A[i] > A[i-1] in LSN[i+1]
-// else LSN[i] =  LSN[i+1]+1 when A[i] <= A[i-1]
+//  when A[i] > A[i+1]
+// else LSN[i] =  LSN[i+1]+1 when A[i] <= A[i+1]
 int LongestNondecreasingSubsequenceLength(const vector<int>& A) {
     vector<pair<int,int>> LSN(A.size(),pair<int,int>(0,0));
     LSN[A.size()-1] = {A[A.size()-1],1};
@@ -22,7 +22,7 @@ int LongestNondecreasingSubsequenceLength(const vector<int>& A) {
             int j=i+1;
             int max_after_i = 0;
             for (; j<A.size();j++){
-                if (A[j]>=A[i] && A[j]<=LSN[j].first) {
+                if (A[j]>=A[i] && A[i]<=LSN[j].first) {
                    max_after_i = max(max_after_i,LSN[j].second +1);
                 }
             }
