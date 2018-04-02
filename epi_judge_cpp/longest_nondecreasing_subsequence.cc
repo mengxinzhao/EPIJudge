@@ -3,53 +3,48 @@
 #include <algorithm>
 #include <iostream>
 #include <utility>
+#include <climits>
 using std::vector;
 using std::max;
 using std::min;
 using std::pair;
-// LSN[i] = max(sequence from (i+1...N), sequence from (k ...N))  k is the first element A[k] > A[i]
-//  when A[i] > A[i+1]
-// else LSN[i] =  LSN[i+1]+1 when A[i] <= A[i+1]
-int LongestNondecreasingSubsequenceLength(const vector<int>& A) {
-    vector<pair<int,int>> LSN(A.size(),pair<int,int>(0,0));
-    LSN[A.size()-1] = {A[A.size()-1],1};
-    int curr_min = A[A.size()-1];
-    for (int i = A.size()-2;i>=0;i--) {
-        //std::cout<<"curr_min: " << curr_min<<" ";
-        if (A[i] >curr_min) {
-            //
-            int num=0;
-            int j=i+1;
-            int max_after_i = 0;
-            for (; j<A.size();j++){
-                if (A[j]>=A[i] && A[i]<=LSN[j].first) {
-                   max_after_i = max(max_after_i,LSN[j].second +1);
-                }
-            }
-            if (LSN[i+1].second > max_after_i) {
-                LSN[i]= LSN[i+1];
-            }
-            else {
-                LSN[i]= {A[i], max_after_i};
-                curr_min = A[i];
-            }
-         }
-        else {
-            LSN[i].second = LSN[i+1].second + 1;
-            LSN[i].first = A[i];
-            curr_min = A[i];
-        }
-        //std::cout<<"i:" << i << " LSN: " <<LSN[i].first<<", "<<  LSN[i].second << std::endl;
-    }
-    return LSN[0].second;
-}
 
+
+// LSN[i] longest nodecreasing subsequence ending in i-th element
+// LSN[i] = 1 + max(LSN[j]) j=0,...i-1 if (A[i]>=A[j])
+// because LSN[i] might be 1 if A[i] is small than all of its previous
+// solution needs to do a linear seach
+// solution =  max(LSN[i])
+// O(N^2) complexity
+int LongestNondecreasingSubsequenceLength2(const vector<int>& A) {
+    vector<int> LSN(A.size(), 1);
+    for (int i=1; i<A.size();i++) {
+        int max_at_i = INT_MIN;
+        for (int j=0; j<=i-1; j++) {
+            if (A[i] >= A[j]) {
+                if (LSN[j] >=max_at_i)
+                    max_at_i = LSN[j];
+            }
+        }
+        if (max_at_i >INT_MIN)
+            LSN[i] = max_at_i + 1;
+
+    }
+    int max_at_i = INT_MIN;
+    for (int i=0; i<A.size();i++) {
+        if (LSN[i] >=max_at_i)
+            max_at_i = LSN[i];
+    }
+        
+    return max_at_i;
+    
+}
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
   std::vector<std::string> param_names{"A"};
   generic_test_main(argc, argv, param_names,
                     "longest_nondecreasing_subsequence.tsv",
-                    &LongestNondecreasingSubsequenceLength);
+                    &LongestNondecreasingSubsequenceLength2);
   return 0;
 }
