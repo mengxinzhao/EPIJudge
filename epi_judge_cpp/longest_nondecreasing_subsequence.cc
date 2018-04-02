@@ -5,10 +5,6 @@
 #include <utility>
 #include <climits>
 using std::vector;
-using std::max;
-using std::min;
-using std::pair;
-
 
 // LSN[i] longest nodecreasing subsequence ending in i-th element
 // LSN[i] = 1 + max(LSN[j]) j=0,...i-1 if (A[i]>=A[j])
