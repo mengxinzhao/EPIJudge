@@ -2,12 +2,15 @@
 #include <algorithm>
 #include <cstddef>
 #include <queue>
+#include <map>
 #include "test_framework/test_utils_serialization_traits.h"
 
 using std::vector;
 using std::priority_queue;
 using std::sort;
 using std::multiset;
+using std::set;
+using std::map;
 using std::max;
 using std::min;
 
@@ -131,11 +134,12 @@ struct point {
 
 struct Compare {
     bool operator() (const point &one, const point &two ){
-        return ((one.y > two.y )||(one.y==two.y && one.x< two.x ));
+        return (one.y > two.y );
     }
 };
 
-bool isHeightTracked( multiset<point, Compare> &contour, int height ){
+
+bool isHeightTracked( set<point, Compare> &contour, int height ){
     for (auto & e: contour) {
         if (e.y == height)
             return true;
@@ -143,18 +147,24 @@ bool isHeightTracked( multiset<point, Compare> &contour, int height ){
     return false;
 }
 
-void deleteHeight(multiset<point, Compare> &contour, int height) {
+void deleteHeight(set<point, Compare> &contour, map<int,int> &height_map, int height) {
     for (auto & iter: contour) {
-        if (iter.y == height && iter.end == false) {
-            //std::cout<<"delete: " <<iter.x << " "<<iter.y << std::endl;
-            contour.erase(iter);
-            break;
+        if (iter.y == height ) {
+            if (height_map[height] == 1) {
+                //std::cout<<"delete: " <<iter.x << " "<<iter.y << std::endl;
+                contour.erase(iter);
+                height_map.erase(height);
+                break;
+            }
+            else
+                height_map[height]--;
         }
     }
 }
 
 Skyline ComputeSkyline2(const vector<Rectangle > & buildings) {
     vector<point> points;
+    
     for (const auto &e: buildings) {
         points.emplace_back(e.left, e.height,false);
         points.emplace_back(e.right,e.height,true);
@@ -163,17 +173,19 @@ Skyline ComputeSkyline2(const vector<Rectangle > & buildings) {
     sort(points.begin(), points.end());
 
     vector<point> merged;
-    multiset<point, Compare> contour; // track the current contour point. the biggest one at the top
+    set<point, Compare> contour; // track the current contour point. the biggest one at the top
+    map<int,int> height_map;
     contour.emplace(points[0].x,0,false);
     
     for (int i=0; i< points.size();i++) {
         int curr_height = contour.begin()->y;
+        //std::cout<<"point: " << points[i].x << " "<<points[i].y<< std::endl;
         // the height is not tracked yet and after inserting it, it
         // becomes the new contour height. add this point
         if (isHeightTracked(contour,points[i].y) == false) {
             contour.emplace(points[i]);
+            height_map[points[i].y]++;
             if (contour.begin()->y > curr_height) {
-                //std::cout<<"insert: " << points[i].x << " "<<points[i].y<< std::endl;
                 merged.emplace_back(points[i].x,curr_height,false);
                 merged.push_back(points[i]);
             }
@@ -182,12 +194,13 @@ Skyline ComputeSkyline2(const vector<Rectangle > & buildings) {
         else  {
             if (points[i].end == false ) {
                 // already a same height start in the set
-                contour.emplace(points[i]);
+                //contour.emplace(points[i]);
+                height_map[points[i].y]++;
             }else {
                 // if delete a point in the contour causes the contour change
                 // add this point
 
-                deleteHeight(contour,points[i].y);
+                deleteHeight(contour,height_map,points[i].y);
                 if (!contour.empty() &&  contour.begin()->y != curr_height) {
                     merged.push_back(points[i]);
                     merged.emplace_back(points[i].x,contour.begin()->y,false);
@@ -214,8 +227,7 @@ Skyline ComputeSkyline2(const vector<Rectangle > & buildings) {
     }
 
     return merged_skl;
-    
-    
+
 }
 
 bool operator==(const Rectangle& a, const Rectangle& b) {
