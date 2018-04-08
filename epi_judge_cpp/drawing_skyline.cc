@@ -1,10 +1,13 @@
 #include <vector>
 #include <algorithm>
 #include <cstddef>
+#include <queue>
 #include "test_framework/test_utils_serialization_traits.h"
 
 using std::vector;
+using std::priority_queue;
 using std::sort;
+using std::multiset;
 using std::max;
 using std::min;
 
@@ -19,9 +22,9 @@ struct Rectangle {
 
 typedef vector<Rectangle> Skyline;
 
-// recursively merge the building contour of building left and building right
+// recursively merge the building contour of left buildings and  right buildings
 Skyline merge_skyline(const vector<Rectangle> &buildings, int left,int right) {
-    if (left == right)
+    if (left >= right)
         return vector<Rectangle>({buildings[left]});
     
     int mid = left + (right - left)/2;
@@ -29,14 +32,14 @@ Skyline merge_skyline(const vector<Rectangle> &buildings, int left,int right) {
     Skyline skl_right = merge_skyline(buildings, mid+1, right);
     Skyline merged;
     
-//    std::cout<<"left: " <<std::endl;
-//    for (int i= 0; i< skl_left.size();i++)
-//        std::cout<<"("<<skl_left[i].left<<", "<<skl_left[i].right<<", "<< skl_left[i].height<<") ";
-//    std::cout<<std::endl;
-//    std::cout<<"right: " <<std::endl;
-//    for (int i= 0; i< skl_right.size();i++)
-//        std::cout<<"("<<skl_right[i].left<<", "<<skl_right[i].right<<", "<< skl_right[i].height<<") ";
-//    std::cout<<std::endl;
+    std::cout<<"left: " <<std::endl;
+    for (int i= 0; i< skl_left.size();i++)
+        std::cout<<"("<<skl_left[i].left<<", "<<skl_left[i].right<<", "<< skl_left[i].height<<") ";
+    std::cout<<std::endl;
+    std::cout<<"right: " <<std::endl;
+    for (int i= 0; i< skl_right.size();i++)
+        std::cout<<"("<<skl_right[i].left<<", "<<skl_right[i].right<<", "<< skl_right[i].height<<") ";
+    std::cout<<std::endl;
     
     //left and right are not connected
     if (skl_left[skl_left.size()-1].right < skl_right[0].left) {
@@ -44,8 +47,8 @@ Skyline merge_skyline(const vector<Rectangle> &buildings, int left,int right) {
         merged.emplace_back(skl_left[skl_left.size()-1].right+1,skl_right[0].left-1,0);
         merged.insert(merged.end(),skl_right.begin(),skl_right.end());
 
-//        for (int i= 0; i< merged.size();i++)
-//            std::cout<<"merged: " <<merged[i].left<<", "<<merged[i].right<<", "<< merged[i].height<<std::endl;
+        for (int i= 0; i< merged.size();i++)
+            std::cout<<"merged: " <<merged[i].left<<", "<<merged[i].right<<", "<< merged[i].height<<std::endl;
         return merged;
     }
     
@@ -81,11 +84,12 @@ Skyline merge_skyline(const vector<Rectangle> &buildings, int left,int right) {
         if (i<skl_right.size())
             merged.insert(merged.end(),skl_right.begin()+i,skl_right.end());
     }
-//    for (int i= 0; i< merged.size();i++)
-//        std::cout<<"merged: " <<merged[i].left<<", "<<merged[i].right<<", "<< merged[i].height<<std::endl;
+    for (int i= 0; i< merged.size();i++)
+        std::cout<<"merged: " <<merged[i].left<<", "<<merged[i].right<<", "<< merged[i].height<<std::endl;
     
     return merged;
 }
+
 
 Skyline ComputeSkyline(const vector<Rectangle>& buildings) {
     vector<Rectangle> blds = buildings;
@@ -95,6 +99,123 @@ Skyline ComputeSkyline(const vector<Rectangle>& buildings) {
     std::cout<<std::endl;
     Skyline merged = merge_skyline(blds,0,blds.size()-1);
     return merged;
+}
+
+
+struct point {
+    int x;
+    int y;
+    bool end;
+    point(int _x, int _y, bool _end):x(_x), y(_y),end(_end) {}
+    bool operator < ( const point &rhs) const {
+        // sort by x
+        if (x < rhs.x)
+            return true;
+        else if (x == rhs.x) {
+            if (end == false && rhs.end == true)
+                // same x the start point is put first
+                 return true;
+            // same end point the smaller y is put first
+            else if (end == true && rhs.end == true && y < rhs.y)
+                return true;
+            // same start point. the bigger y is put first
+            else if (end == false && rhs.end == false && y > rhs.y )
+                return true;
+            else
+                return false;
+        }
+        else
+            return false;
+    }
+};
+
+struct Compare {
+    bool operator() (const point &one, const point &two ){
+        return ((one.y > two.y )||(one.y==two.y && one.x< two.x ));
+    }
+};
+
+bool isHeightTracked( multiset<point, Compare> &contour, int height ){
+    for (auto & e: contour) {
+        if (e.y == height)
+            return true;
+    }
+    return false;
+}
+
+void deleteHeight(multiset<point, Compare> &contour, int height) {
+    for (auto & iter: contour) {
+        if (iter.y == height && iter.end == false) {
+            //std::cout<<"delete: " <<iter.x << " "<<iter.y << std::endl;
+            contour.erase(iter);
+            break;
+        }
+    }
+}
+
+Skyline ComputeSkyline2(const vector<Rectangle > & buildings) {
+    vector<point> points;
+    for (const auto &e: buildings) {
+        points.emplace_back(e.left, e.height,false);
+        points.emplace_back(e.right,e.height,true);
+    }
+    // sort the points by left
+    sort(points.begin(), points.end());
+
+    vector<point> merged;
+    multiset<point, Compare> contour; // track the current contour point. the biggest one at the top
+    contour.emplace(points[0].x,0,false);
+    
+    for (int i=0; i< points.size();i++) {
+        int curr_height = contour.begin()->y;
+        // the height is not tracked yet and after inserting it, it
+        // becomes the new contour height. add this point
+        if (isHeightTracked(contour,points[i].y) == false) {
+            contour.emplace(points[i]);
+            if (contour.begin()->y > curr_height) {
+                //std::cout<<"insert: " << points[i].x << " "<<points[i].y<< std::endl;
+                merged.emplace_back(points[i].x,curr_height,false);
+                merged.push_back(points[i]);
+            }
+
+        }
+        else  {
+            if (points[i].end == false ) {
+                // already a same height start in the set
+                contour.emplace(points[i]);
+            }else {
+                // if delete a point in the contour causes the contour change
+                // add this point
+
+                deleteHeight(contour,points[i].y);
+                if (!contour.empty() &&  contour.begin()->y != curr_height) {
+                    merged.push_back(points[i]);
+                    merged.emplace_back(points[i].x,contour.begin()->y,false);
+                }
+                else if (contour.empty()) {
+                    // when we have empty space bewteen buildings
+                    merged.push_back(points[i]);
+                    merged.emplace_back(points[i].x,0,false);
+                }
+            }
+        }
+        
+    }
+    // we have got  the merged points. now stitch together
+    Skyline merged_skl;
+    for (int i=0; i < merged.size()-1;) {
+        int left = merged[i].x;
+        //std::cout<<merged[i].x<<","<<merged[i].y<< std::endl;
+        while (left == merged[i].x){
+            i++;
+        }
+        merged_skl.emplace_back(left,merged[i].x,merged[i].y);
+        i++;
+    }
+
+    return merged_skl;
+    
+    
 }
 
 bool operator==(const Rectangle& a, const Rectangle& b) {
@@ -114,6 +235,6 @@ std::ostream& operator<<(std::ostream& out, const Rectangle& r) {
 int main(int argc, char* argv[]) {
   std::vector<std::string> param_names{"buildings"};
   generic_test_main(argc, argv, param_names, "drawing_skyline.tsv",
-                    &ComputeSkyline);
+                    &ComputeSkyline2);
   return 0;
 }
