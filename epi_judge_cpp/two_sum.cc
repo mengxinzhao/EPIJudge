@@ -4,7 +4,6 @@
 using std::vector;
 
 bool HasTwoSum(const vector<int>& A, int t) {
-  // Implement this placeholder.
   // assume the matrix is sorted already
   int i = 0;
   int j = A.size()-1;
