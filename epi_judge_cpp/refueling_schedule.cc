@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <algorithm>
 #include <iostream>
+#include <utility>
 using std::vector;
 using std::sort;
 
@@ -54,12 +55,43 @@ int FindAmpleCity(const vector<int>& gallons, const vector<int>& distances) {
     return -1;//no such city
 }
 
+//gallons:[4, 2, 6, 6, 4, 5, 3]
+//cost  : [2, 2, 6, 7, 6, 5, 2]
+//start:  0
+//remains  0  2  2  2  1  -1 -1 ==> 0
+//start 1     0  0  0  -1 -3 -3 -2  ==> 0
+//start 2        0  0  -1 -3 -3 -2  0 ==> 0
+//start 5                  0  0  1  3  3  3  2  == > 0
+//the worst point that is running short of the gas the must be the starting point if it
+//can make the move,then every point will be at least >=that point's gas
+struct CityAndRemainingGas {
+    int city = 0, remaining_gallons = 0;
+};
 
+int FindAmpleCity_Greedy(const vector<int>& gallons, const vector<int>& distances) {
+    int remaining_gallons = 0;
+    
+    CityAndRemainingGas city_remaining_gallons_pair;
+    const int num_cities = gallons.size();
+    for (int i = 1; i < num_cities; ++i) {
+        remaining_gallons += gallons[i - 1] - distances[i - 1] / 20;
+        if (remaining_gallons < city_remaining_gallons_pair.remaining_gallons) {
+            city_remaining_gallons_pair = {i, remaining_gallons};
+            //std::cout<<"gallons: "<< remaining_gallons << std::endl;
+        }
+        
+    }
+    //at this point the city has the lowest remaining gas before filling up the tank
+    if (gallons[city_remaining_gallons_pair.city] >= distances[city_remaining_gallons_pair.city]/20)
+        return city_remaining_gallons_pair.city;
+    else
+        return -1;
+}
 #include "test_framework/test_utils_generic_main.h"
 
 int main(int argc, char* argv[]) {
   std::vector<std::string> param_names{"gallons", "distances"};
   generic_test_main(argc, argv, param_names, "refueling_schedule.tsv",
-                    &FindAmpleCity);
+                    &FindAmpleCity_Greedy);
   return 0;
 }
