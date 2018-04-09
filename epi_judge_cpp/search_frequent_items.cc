@@ -23,7 +23,7 @@ vector<string> SearchFrequentItems(
         iter++;
     }
     for (const auto & iter: word_count){
-        if (iter.second >=count/k )
+        if (iter.second >count/k )
             hitters.push_back(iter.first);
     }
     return hitters;
@@ -66,7 +66,8 @@ vector<string> SearchFrequentItems_MG(
         iter++;
         count++;
     }
-    
+    // there are false positive
+    // have to verify it again
     for ( auto & elem: distinct_set) {
         elem.second = 0;
         //std::cout<< elem.first<< ", ";
