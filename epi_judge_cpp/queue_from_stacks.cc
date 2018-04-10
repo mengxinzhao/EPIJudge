@@ -1,22 +1,38 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <stack>
 
 #include "test_framework/test_failure_exception.h"
 #include "test_framework/test_utils_serialization_traits.h"
 
 using std::length_error;
+using std::stack;
 
 class Queue {
+    stack<int> in_stack;
+    stack<int> out_stack;
  public:
   void Enqueue(int x) {
-    // Implement this placeholder.
-    return;
+      in_stack.push(x);
+      return;
   }
 
   int Dequeue() {
-    // Implement this placeholder.
-    return 0;
+      int top;
+      if (!out_stack.empty()){
+          top = out_stack.top();
+          out_stack.pop();
+      }else {
+         //move every element to out_stack and pop the last one in in_stack
+          while(in_stack.size()>1){
+              out_stack.push(in_stack.top());
+              in_stack.pop();
+          }
+          top = in_stack.top();
+          in_stack.pop();
+      }
+      return top;
   }
 };
 
