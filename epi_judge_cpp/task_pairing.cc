@@ -1,5 +1,8 @@
 #include <tuple>
 #include <vector>
+#include <algorithm>
+
+using std::sort;
 
 #include "test_framework/test_utils_serialization_traits.h"
 
@@ -7,11 +10,27 @@ using std::vector;
 
 struct PairedTasks {
   int task_1, task_2;
+    PairedTasks(int _task1, int _task2):task_1(_task1),task_2(_task2) {}
 };
 
+// greedy algorithm
+// pick two ends for each worker till left right meets each other
+
 vector<PairedTasks> OptimumTaskAssignment(vector<int> task_durations) {
-  // Implement this placeholder.
-  return {};
+    
+    if (task_durations.empty())
+        return {};
+    sort(task_durations.begin(), task_durations.end());
+    vector<PairedTasks> result;
+    size_t left = 0;
+    size_t right = task_durations.size()-1;
+    
+    while(left<right) {
+        result.emplace_back(task_durations[left],task_durations[right]);
+        left++;
+        right--;
+    }
+    return result;
 }
 
 template <>
