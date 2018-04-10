@@ -30,7 +30,7 @@ int FindAmpleCity(const vector<int>& gallons, const vector<int>& distances) {
 
     int i = 0;
     while( i< candidates.size() && candidates[i].ratio >=1) {
-        int gallon_sum =0;
+        float gallon_sum =0;
         float cost_sum =0;
         int start_index = candidates[i].index;
         int index =start_index;
@@ -62,6 +62,7 @@ int FindAmpleCity(const vector<int>& gallons, const vector<int>& distances) {
 //start 1     0  0  0  -1 -3 -3 -2  ==> 0
 //start 2        0  0  -1 -3 -3 -2  0 ==> 0
 //start 5                  0  0  1  3  3  3  2  == > 0
+//start 6                     0  1  3  3  3  2  0  ==> 0
 //the worst point that is running short of the gas the must be the starting point if it
 //can make the move,then every point will be at least >=that point's gas
 struct CityAndRemainingGas {
@@ -92,6 +93,6 @@ int FindAmpleCity_Greedy(const vector<int>& gallons, const vector<int>& distance
 int main(int argc, char* argv[]) {
   std::vector<std::string> param_names{"gallons", "distances"};
   generic_test_main(argc, argv, param_names, "refueling_schedule.tsv",
-                    &FindAmpleCity_Greedy);
+                    &FindAmpleCity);
   return 0;
 }
