@@ -24,7 +24,7 @@ struct Coordinate {
     
 };
 
-bool NextStep(vector<vector<Color>>maze, vector<vector<int>>&visited,vector<Coordinate> &path,Coordinate current, const Coordinate &end) {
+bool NextStep(vector<vector<Color>> &maze,vector<Coordinate> &path,Coordinate current, const Coordinate &end) {
     
     //std::cout<<"trying..."<<current.x << ", "<< current.y << std::endl;
     if (current == end) {
@@ -37,9 +37,9 @@ bool NextStep(vector<vector<Color>>maze, vector<vector<int>>&visited,vector<Coor
         int y = iter.second;
         // the test data requires maze[x][y] instead of usual matrix[row][col] convension
         //if (x>=0 && y>=0 && y<maze.size() &&   x < maze[y].size() && maze[y][x] == WHITE && !visited[y][x]){
-        if (x>=0 && y>=0 && x<maze.size() &&   y < maze[x].size() && maze[x][y] == WHITE && !visited[x][y]){
-            visited[x][y]= 1;
-            if (NextStep(maze,visited,path,{x,y},end)) {
+        if (x>=0 && y>=0 && x<maze.size() &&   y < maze[x].size() && maze[x][y] == WHITE){
+            maze[x][y]= BLACK;
+            if (NextStep(maze,path,{x,y},end)) {
                 path.emplace_back(x,y);
                 return true;
             }
@@ -51,8 +51,8 @@ bool NextStep(vector<vector<Color>>maze, vector<vector<int>>&visited,vector<Coor
 vector<Coordinate> SearchMaze(vector<vector<Color>> maze, const Coordinate& s,
                               const Coordinate& e) {
     vector<Coordinate>path;
-    vector<vector<int>>visited(maze.size(),vector<int>(maze[0].size(),0));
-    if (NextStep(maze,visited,path,s,e))
+    maze[s.x][s.y] = BLACK;
+    if (NextStep(maze,path,s,e))
         path.push_back(s);
     std::reverse(path.begin(), path.end());
 
