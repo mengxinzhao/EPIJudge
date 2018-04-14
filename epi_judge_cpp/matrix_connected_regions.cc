@@ -1,14 +1,47 @@
 #include <deque>
 #include <vector>
+#include <queue>
+#include <iostream>
 
 #include "test_framework/test_timer.h"
 
 using std::deque;
 using std::vector;
+using std::queue;
 
+struct Cell {
+    int x;
+    int y;
+    Cell(int _x, int _y):x(_x),y(_y) {}
+};
+bool GoodChoice(const Cell &loc, bool color, vector<deque<bool>> &image) {
+    if (loc.x < image.size() && loc.x >=0 && loc.y < image[loc.x].size() && loc.y >=0 && image[loc.x][loc.y]== color)
+        return true;
+    else
+        return false;
+}
+
+// BFS travel to flip all connected cells
+// O(N*M) //N image width, M image height
 void FlipColor(int x, int y, vector<deque<bool>>* image_ptr) {
-  // Implement this placeholder.
-  return;
+    bool color_to_flip = (*image_ptr)[x][y];
+    queue<Cell> curr_q;
+    curr_q.emplace(x,y);
+    (*image_ptr)[x][y]= !color_to_flip; // flip also marked as visited
+    while(!curr_q.empty()) {
+        Cell curr = curr_q.front();
+        //visit and flip the color
+        (*image_ptr)[curr.x][curr.y] = !color_to_flip;
+        curr_q.pop();
+        
+        vector<Cell> candidates = { {curr.x-1,curr.y},{curr.x+1,curr.y},{curr.x,curr.y+1},{curr.x,curr.y-1} };
+        for (const auto &cand: candidates) {
+            if (GoodChoice(cand, color_to_flip, *image_ptr)){
+                curr_q.emplace(cand.x,cand.y);
+            }
+        }
+    }
+    return;
 }
 
 vector<vector<int>> FlipColorWrapper(TestTimer& timer, int x, int y,
