@@ -3,16 +3,22 @@
 #include <vector>
 #include <set>
 #include <iostream>
+#include <queue>
+#include <cassert>
+#include <functional>
 #include "test_framework/test_timer.h"
 
 using std::string;
 using std::vector;
 using std::set;
-
+using std::queue;
 struct Cell {
     int y;
     int x;
     Cell(int _y, int _x):y(_y),x(_x){}
+    bool operator==(const Cell &rhs) {
+        return y == rhs.y && x == rhs.x;
+    }
 };
 struct Compare
 {
@@ -43,10 +49,34 @@ void DFS(vector<vector<char>> &board,set<Cell,Compare> &cells_to_visit,
     return;
 }
 
+void BFS(vector<vector<char>> &board, set<Cell, Compare> &cells_to_visit,
+         Cell current,vector<Cell> &region) {
+    queue<Cell> graph_q;
+    graph_q.push(current);
+    cells_to_visit.erase(current);
+    while(!graph_q.empty()) {
+        Cell curr = graph_q.front();
+        region.push_back(curr);
+        graph_q.pop();
+        
+        vector<Cell>candidates = {{curr.y+1, curr.x}, {curr.y-1,curr.x}, {curr.y, curr.x+1}, {curr.y,curr.x-1}};
+        
+        for (auto cand: candidates) {
+            if (IsFeasible(board,cells_to_visit, cand) ) {
+                cells_to_visit.erase(cand);
+                graph_q.push(cand);
+            }
+        }
+    }
+    return ;
+    
+}
+
 void FillSurroundedRegions(vector<vector<char>>* board_ptr) {
     set<Cell,Compare> cells_to_visit;
     vector<Cell> white_region;
     vector<vector<Cell>> white_regions;
+    
     for (size_t i=0; i< (*board_ptr).size();i++) {
         for (size_t j=0; j <(*board_ptr)[i].size();j++) {
             if ((*board_ptr)[i][j] == 'W'){
@@ -54,13 +84,15 @@ void FillSurroundedRegions(vector<vector<char>>* board_ptr) {
             }
         }
     }
+    std::cout<<"cells_to_visit: "<<cells_to_visit.size()<<std::endl;
     //DFS to find the white region
     // each call of DFS will discover all the nodes in the white connected region
     while(!cells_to_visit.empty()){
         auto  iter = cells_to_visit.begin();
         Cell current = *iter;
         white_region.clear();
-        DFS(*board_ptr,cells_to_visit, current,white_region);
+        //DFS(*board_ptr,cells_to_visit, current,white_region);
+        BFS(*board_ptr,cells_to_visit, current,white_region);
         if (!white_region.empty())
             white_regions.push_back(white_region);
     }
