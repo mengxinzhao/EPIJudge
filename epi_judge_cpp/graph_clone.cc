@@ -2,22 +2,72 @@
 #include <queue>
 #include <unordered_set>
 #include <vector>
+#include <set>
+#include <queue>
+#include <iostream>
 
 #include "test_framework/test_failure_exception.h"
 #include "test_framework/test_utils_serialization_traits.h"
 
 using std::queue;
 using std::unordered_set;
+using std::set;
 using std::vector;
+//using std::pair;
 
 struct GraphVertex {
   int label;
   vector<GraphVertex*> edges;
+    GraphVertex(int _label) : label(_label),edges({}) {}
+//    GraphVertex(GraphVertex *lh) {
+//      if (lh!= nullptr) {
+//          label = lh->label;
+//          for (auto &iter: lh->edges) {
+//              edges.emplace_back(iter->label);
+//          }
+//      }
+//  }
 };
 
+struct pair {
+    GraphVertex *orig;
+    GraphVertex *cloned;
+    pair(GraphVertex *_org, GraphVertex *_cloned):orig(_org),cloned(_cloned){}
+};
+
+// BFS fashion to clone vertex and its vertexes reachable
 GraphVertex* CloneGraph(GraphVertex* graph) {
-  // Implement this placeholder.
-  return nullptr;
+    set<GraphVertex *> visited;
+    queue<pair> clone_q;
+    
+    GraphVertex *cloned_root = new GraphVertex(graph->label);
+    clone_q.emplace(graph,cloned_root);
+
+    while(!clone_q.empty()) {
+        pair  orig_cloned = clone_q.front();
+        clone_q.pop();
+        if (visited.find(orig_cloned.orig) == visited.end()) {
+            visited.insert(orig_cloned.orig);
+            //std::cout<<"copying vertex: "<< orig_cloned.cloned->label<<std::endl;
+            for(auto &to_v: orig_cloned.orig->edges) {
+                // a new node discovered. create it and add the edge to the cloned  edges
+                GraphVertex *cloned_root = nullptr;
+                //std::cout<<"copying edge "<<orig_cloned.orig->label<<"->"<< to_v->label<<std::endl;
+                auto v_iter = visited.find(to_v);
+                if (v_iter==visited.end()){
+                    cloned_root = new GraphVertex(to_v->label);
+                    //std::cout<<"enqueue: "<<to_v->label<<std::endl;
+                    clone_q.emplace(to_v, cloned_root);    // insert the new node pair v, cloned_v
+                }else {
+                    cloned_root = *v_iter;
+                }
+                orig_cloned.cloned->edges.push_back(cloned_root); // add the edge
+            }
+            
+        }
+    }
+    
+  return cloned_root;
 }
 
 vector<int> CopyLabels(const vector<GraphVertex*>& edges) {
@@ -46,6 +96,7 @@ void CheckAndDeallocateGraph(GraphVertex* node,
     vector<int> label1 = CopyLabels(vertex->edges),
                 label2 = CopyLabels(graph[vertex->label].edges);
     sort(begin(label1), end(label1)), sort(begin(label2), end(label2));
+
     if (label1 != label2) {
       throw TestFailureException("Invalid vertex label");
     }
