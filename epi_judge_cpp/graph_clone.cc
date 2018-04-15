@@ -13,7 +13,6 @@ using std::queue;
 using std::unordered_set;
 using std::set;
 using std::vector;
-//using std::pair;
 
 struct GraphVertex {
   int label;
@@ -21,26 +20,21 @@ struct GraphVertex {
   GraphVertex(int _label) : label(_label),edges({}) {}
 };
 
-
-// BFS  clone vertex and its vertexes reachable
+// DFS  clone vertex and its vertexes reachable
 // This would ensure that a sink node gets cloned after all
-// its predecessor nodes are cloned first. This would eliminate duplicatively cloning a sink
+// its predecessor nodes are cloned first. This would eliminate double cloning a sink
 // when there are multiple source nodes pointing to it
 GraphVertex* CloneVertex(GraphVertex* graph, set<GraphVertex*> &visited) {
     
     GraphVertex *cloned_u = new GraphVertex(graph->label);
     visited.insert(graph);
-//    std::cout<<"copying vertex: "<< graph->label<<std::endl;
     for (auto &to_v: graph->edges) {
         auto iter = visited.find(to_v);
         if (iter==visited.end()){
             GraphVertex *cloned_v = CloneVertex(to_v, visited);
             cloned_u->edges.push_back(cloned_v);
-             //std::cout<<"copying edge "<<cloned_u->label<<"->"<< cloned_v->label<<std::endl;
         }else {
             cloned_u->edges.push_back(*iter);
-            //std::cout<<"vertex " << to_v->label<<" seen"<<std::endl;
-            //std::cout<<"copying edge "<<cloned_u->label<<"->"<< (*iter)->label<<std::endl;
         }
     }
     
@@ -48,7 +42,6 @@ GraphVertex* CloneVertex(GraphVertex* graph, set<GraphVertex*> &visited) {
 }
 
 void DeleteVertex(GraphVertex *graph,set<GraphVertex*> &deleted) {
-    //std::cout<<"deleting vertex: "<< graph->label<<std::endl;
     deleted.insert(graph);
     while(!graph->edges.empty()){
         GraphVertex *to_v = graph->edges.back();
@@ -57,12 +50,12 @@ void DeleteVertex(GraphVertex *graph,set<GraphVertex*> &deleted) {
             // delete the vertex first
             DeleteVertex(to_v,deleted);
         }
-        //std::cout<<"deleting edge "<<graph->label<<"->"<< to_v->label<<std::endl;
         graph->edges.pop_back();
 
     }
     if (deleted.find(graph) == deleted.end()) {
-        // might have been deleted already
+        // might have been deleted already when this node is a source node to other sinks
+        // along the path
         delete graph;
     }
 }
@@ -114,11 +107,7 @@ void CheckAndDeallocateGraph(GraphVertex* node,
       }
     }
   }
-  // this is problematic since some node's vertex doesn't get created
-  // it is just a copy from the existing vertex
-//  for (auto& v : vertex_set) {
-//    delete v;
-//  }
+
     GraphVertex *v = *vertex_set.begin();
     DeleteGraph(v);
 }
