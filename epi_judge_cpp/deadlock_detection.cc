@@ -1,19 +1,42 @@
 #include <stdexcept>
 #include <vector>
-
+#include <set>
+#include <iostream>
 #include "test_framework/test_timer.h"
 #include "test_framework/test_utils_serialization_traits.h"
 
 using std::vector;
+using std::set;
 
 struct GraphVertex {
   enum Color { white, gray, black } color = white;
   vector<GraphVertex*> edges;
 };
 
+// DFS travel and if encountering  one vertex already seen
+// that is deadlock
+bool IsDeadlocked_DFS(GraphVertex *graph,   set<GraphVertex*> &visited){
+    visited.insert(graph);
+    
+    for (auto &vertex: graph->edges) {
+        if (visited.find(vertex)== visited.end()){
+            if (IsDeadlocked_DFS(vertex,visited))
+                return true;
+        }else
+            return true;
+    }
+    
+    return false;
+}
+
 bool IsDeadlocked(vector<GraphVertex>* graph) {
-  // Implement this placeholder.
-  return true;
+    GraphVertex last_vertex = graph->back();
+    set<GraphVertex*> visited;
+    for (auto &vertex: *graph) {
+        if ( visited.find(&vertex)== visited.end() &&  IsDeadlocked_DFS(&vertex,visited))
+            return true;
+    }
+    return false;
 }
 
 struct Edge {
