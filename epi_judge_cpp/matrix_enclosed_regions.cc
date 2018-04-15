@@ -76,7 +76,7 @@ void FillSurroundedRegions(vector<vector<char>>* board_ptr) {
     set<Cell,Compare> cells_to_visit;
     vector<Cell> white_region;
     vector<vector<Cell>> white_regions;
-    
+    // O( N*M*log(K)) the size of the board height * width. the number of white cells
     for (size_t i=0; i< (*board_ptr).size();i++) {
         for (size_t j=0; j <(*board_ptr)[i].size();j++) {
             if ((*board_ptr)[i][j] == 'W'){
@@ -84,9 +84,8 @@ void FillSurroundedRegions(vector<vector<char>>* board_ptr) {
             }
         }
     }
-    std::cout<<"cells_to_visit: "<<cells_to_visit.size()<<std::endl;
-    //DFS to find the white region
-    // each call of DFS will discover all the nodes in the white connected region
+    // O(Klog(K)) K: the number of white cells.log introduced because of underlying set delete
+    // each call of BFS will discover all the nodes in the white connected region
     while(!cells_to_visit.empty()){
         auto  iter = cells_to_visit.begin();
         Cell current = *iter;
