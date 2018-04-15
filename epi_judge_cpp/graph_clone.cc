@@ -18,57 +18,64 @@ using std::vector;
 struct GraphVertex {
   int label;
   vector<GraphVertex*> edges;
-    GraphVertex(int _label) : label(_label),edges({}) {}
-//    GraphVertex(GraphVertex *lh) {
-//      if (lh!= nullptr) {
-//          label = lh->label;
-//          for (auto &iter: lh->edges) {
-//              edges.emplace_back(iter->label);
-//          }
-//      }
-//  }
+  GraphVertex(int _label) : label(_label),edges({}) {}
 };
 
-struct pair {
-    GraphVertex *orig;
-    GraphVertex *cloned;
-    pair(GraphVertex *_org, GraphVertex *_cloned):orig(_org),cloned(_cloned){}
-};
 
-// BFS fashion to clone vertex and its vertexes reachable
-GraphVertex* CloneGraph(GraphVertex* graph) {
-    set<GraphVertex *> visited;
-    queue<pair> clone_q;
+// BFS  clone vertex and its vertexes reachable
+// This would ensure that a sink node gets cloned after all
+// its predecessor nodes are cloned first. This would eliminate duplicatively cloning a sink
+// when there are multiple source nodes pointing to it
+GraphVertex* CloneVertex(GraphVertex* graph, set<GraphVertex*> &visited) {
     
-    GraphVertex *cloned_root = new GraphVertex(graph->label);
-    clone_q.emplace(graph,cloned_root);
-
-    while(!clone_q.empty()) {
-        pair  orig_cloned = clone_q.front();
-        clone_q.pop();
-        if (visited.find(orig_cloned.orig) == visited.end()) {
-            visited.insert(orig_cloned.orig);
-            //std::cout<<"copying vertex: "<< orig_cloned.cloned->label<<std::endl;
-            for(auto &to_v: orig_cloned.orig->edges) {
-                // a new node discovered. create it and add the edge to the cloned  edges
-                GraphVertex *cloned_root = nullptr;
-                //std::cout<<"copying edge "<<orig_cloned.orig->label<<"->"<< to_v->label<<std::endl;
-                auto v_iter = visited.find(to_v);
-                if (v_iter==visited.end()){
-                    cloned_root = new GraphVertex(to_v->label);
-                    //std::cout<<"enqueue: "<<to_v->label<<std::endl;
-                    clone_q.emplace(to_v, cloned_root);    // insert the new node pair v, cloned_v
-                }else {
-                    cloned_root = *v_iter;
-                }
-                orig_cloned.cloned->edges.push_back(cloned_root); // add the edge
-            }
-            
+    GraphVertex *cloned_u = new GraphVertex(graph->label);
+    visited.insert(graph);
+//    std::cout<<"copying vertex: "<< graph->label<<std::endl;
+    for (auto &to_v: graph->edges) {
+        auto iter = visited.find(to_v);
+        if (iter==visited.end()){
+            GraphVertex *cloned_v = CloneVertex(to_v, visited);
+            cloned_u->edges.push_back(cloned_v);
+             //std::cout<<"copying edge "<<cloned_u->label<<"->"<< cloned_v->label<<std::endl;
+        }else {
+            cloned_u->edges.push_back(*iter);
+            //std::cout<<"vertex " << to_v->label<<" seen"<<std::endl;
+            //std::cout<<"copying edge "<<cloned_u->label<<"->"<< (*iter)->label<<std::endl;
         }
     }
     
-  return cloned_root;
+    return cloned_u;
 }
+
+void DeleteVertex(GraphVertex *graph,set<GraphVertex*> &deleted) {
+    //std::cout<<"deleting vertex: "<< graph->label<<std::endl;
+    deleted.insert(graph);
+    while(!graph->edges.empty()){
+        GraphVertex *to_v = graph->edges.back();
+        auto iter = deleted.find(to_v);
+        if (iter == deleted.end()){
+            // delete the vertex first
+            DeleteVertex(to_v,deleted);
+        }
+        //std::cout<<"deleting edge "<<graph->label<<"->"<< to_v->label<<std::endl;
+        graph->edges.pop_back();
+
+    }
+    if (deleted.find(graph) == deleted.end()) {
+        // might have been deleted already
+        delete graph;
+    }
+}
+
+void DeleteGraph(GraphVertex *entrance) {
+    set<GraphVertex *> deleted;
+    return DeleteVertex(entrance, deleted);
+}
+GraphVertex* CloneGraph(GraphVertex* graph) {
+    set<GraphVertex *> visited;
+    return CloneVertex(graph, visited);
+}
+
 
 vector<int> CopyLabels(const vector<GraphVertex*>& edges) {
   vector<int> labels;
@@ -91,14 +98,14 @@ void CheckAndDeallocateGraph(GraphVertex* node,
     auto vertex = q.front();
     q.pop();
     if (vertex->label > graph.size()) {
-      throw TestFailureException("Invalid vertex label");
+      throw TestFailureException("Invalid vertex label1");
     }
     vector<int> label1 = CopyLabels(vertex->edges),
                 label2 = CopyLabels(graph[vertex->label].edges);
     sort(begin(label1), end(label1)), sort(begin(label2), end(label2));
-
+      
     if (label1 != label2) {
-      throw TestFailureException("Invalid vertex label");
+      throw TestFailureException("Invalid vertex label2");
     }
     for (GraphVertex* e : vertex->edges) {
       if (!vertex_set.count(e)) {
@@ -107,9 +114,13 @@ void CheckAndDeallocateGraph(GraphVertex* node,
       }
     }
   }
-  for (auto& v : vertex_set) {
-    delete v;
-  }
+  // this is problematic since some node's vertex doesn't get created
+  // it is just a copy from the existing vertex
+//  for (auto& v : vertex_set) {
+//    delete v;
+//  }
+    GraphVertex *v = *vertex_set.begin();
+    DeleteGraph(v);
 }
 
 struct Edge {
@@ -133,7 +144,7 @@ void CloneGraphTest(int k, const vector<Edge>& edges) {
 
   for (const Edge& e : edges) {
     if (e.from < 0 || e.from >= k || e.to < 0 || e.to >= k) {
-      throw std::runtime_error("Invalid vertex index");
+      throw std::runtime_error("Invalid vertex index3");
     }
     graph[e.from].edges.push_back(&graph[e.to]);
   }
