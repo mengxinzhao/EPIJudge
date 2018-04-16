@@ -10,23 +10,19 @@ struct Item {
 };
 
 // solve referring to MIT algorithm lecture 21.
-// DP[i,j] value sum of item i under weight j
-// DP[i,j] = max(DP[i+1,j], v[i] + DP[i+1, j-w[i]] if  w[i] <j )
-// DP[n,0] = 0
-
-// return DP[0,capacity]
+// DP[i][j]: optimal value of selecting up to ith item under weight j
+// DP[i,j] = max(DP[i-1,j], v[i] + DP[i-1, j-w[i]] if  w[i] <j )  i>=1
 int OptimumSubjectToCapacity(const vector<Item>& items, int capacity) {
     vector<vector<int>> DP(items.size()+1, vector<int>(capacity+1,0) );
-    
-    for (int i=items.size()-1; i>=0;i--) {
+    for (int i=1; i<=items.size();i++) {
         for (int j = 0;j <=capacity;j++){
-            if (j-items[i].weight >=0)
-                DP[i][j] = max(DP[i+1][j], items[i].value + DP[i+1][j-items[i].weight]);
+            if (j-items[i-1].weight >=0)  // item index starts from 0 so i-1s
+                DP[i][j] = max(DP[i-1][j], items[i-1].value + DP[i-1][j-items[i-1].weight]);
             else
-                DP[i][j] = DP[i+1][j];
+                DP[i][j] = DP[i-1][j];
         }
     }
-    return DP[0][capacity];
+    return DP[items.size()][capacity];
 }
 
 template <>
