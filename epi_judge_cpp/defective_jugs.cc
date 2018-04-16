@@ -14,34 +14,6 @@ struct Jug {
     int high;
     int low;
 };
-// if [510,515] jug is used in the final step, the already measured milk
-// needs to be ([2100-510], [2300-515]. The last stage remain milk if not fitting the size of any
-// jugs will not be feasible to measure milk.
-// [L,H] feasible  = [L-550, H-515]  || || [L-290, H-310| ||  [ L- 230, H- 240]
-// L,H feasible =  OR ( (L - jugs[i].low)feasible && (L - jugs[i].high) feasible) i=0...N
-// use DP[L][H] = true/false indicate if a L,H range is feasible to be measured by the jugs
-// DP[0][0] = true
-// DP[jugs[i].high][DP[jugs[i]].low] = true for all i=0...N
-// Not a good solution at all too slow
-bool CheckFeasible_DP(const vector<Jug>& Jugs, int L, int H) {
-    vector<vector<bool>> feasible(H+1, vector<bool>(L+1,false));
-    // init
-
-    feasible[0][0] = true;
-
-    for (int h = 1; h<= H; h++) {
-        for (int l = 1; l <= L; l++) {
-            for (size_t k=0; k< Jugs.size();k++) {
-                for (int hh = 0; hh < Jugs[k].high && h+hh <=H;hh++)
-                    for (int ll =0; ll< Jugs[k].low && l+ll<=L;ll++) {
-                        //can be measured by one jug
-                        feasible[h+hh][l+ll] =  true;
-                    }
-            }
-        }
-    }
-    return feasible[H][L];
-}
 
 struct range{
     int low;
