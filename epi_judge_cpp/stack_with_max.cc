@@ -6,72 +6,18 @@
 using std::length_error;
 #include <stack>
 
-// not efficient
-#if 0
-class Stack {
- public:
-  bool Empty() const {
-    // Implement this placeholder.
-    return st.empty();
-  }
-
-  int Max() const {
-    // Implement this placeholder.
-    return st[max_index];
-  }
-
-  int Pop() {
-    // Implement this placeholder.
-	  int top = -1;
-	  top = st.back();
-	  if (st.size()==1) {
-		  max_index = -1;
-		  st.pop_back();
-	  }
-	  else  {
-		  st.pop_back();
-		  int max = INT_MIN;
-		  for (int i=0; i< st.size();i++) {
-			  if (st[i] > max) {
-				  max = st[i];
-				  max_index = i;
-			  }
-		  }
-	  }
-	  return top;
-  }
-
-  void Push(int x) {
-    // Implement this placeholder.
-	  if (st.empty())
-		  max_index = 0;
-	  else if (x > st[max_index]) {
-		   max_index = st.size();
-	  }
-	  st.push_back(x);
-    return;
-  }
-private:
-		std::vector<int> st;
-		int max_index = -1;
-};
-#endif
-
 
 class Stack {
 public:
 		bool Empty() const {
-			// Implement this placeholder.
 			return st.empty();
 		}
 
 		int Max() const {
-			// Implement this placeholder.
 			return max_st.top();
 		}
 
 		int Pop() {
-			// Implement this placeholder.
 			int top = -1;
 			top = st.top();
 			st.pop();
@@ -80,10 +26,9 @@ public:
 		}
 
 		void Push(int x) {
-			// Implement this placeholder.
-			if (x > max_st.top())
+			if (max_st.empty() || x > max_st.top())
 				max_st.push(x);
-			else
+			else 
 				max_st.push(max_st.top());
 			st.push(x);
 		}
