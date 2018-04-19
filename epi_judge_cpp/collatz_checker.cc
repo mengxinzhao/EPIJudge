@@ -8,8 +8,6 @@ using std::unordered_map;
 bool TestCollatzConjectureHelper(int n , int parent, unordered_map<int, int> &cache ) {
     //if it is in the cache good
     //std::cout<<"checking "<< n << ", parent: "<< parent << std::endl;
-    if (n< 0)
-        return false;
     auto iter = cache.find(n);
     if (iter!= cache.end() && iter->second == 1) {
         cache[parent] = 1;
