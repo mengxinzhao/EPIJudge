@@ -1,26 +1,44 @@
 #include <vector>
-
+#include <algorithm>
 #include "test_framework/test_utils_serialization_traits.h"
 
 using std::vector;
-
+using std::min;
+using std::max;
 struct MinMax {
   int smallest, largest;
 };
 
 MinMax FindMinMax(const vector<int>& A) {
-  // Implement this placeholder.
-  MinMax val = {INT_MAX, INT_MIN};
-  for (int i =0 ; i< A.size();i++) {
-    if (val.smallest > A[i]) {
-      val.smallest = A[i];
+    if (A.size() == 1)
+        return {A[0],A[0]};
+    else if (A.size() == 2) {
+        return {min(A[0],A[1]), max(A[0],A[1])};
     }
-    if (val.largest < A [i]) {
-      val.largest = A[i];
+    MinMax val;
+    int start;
+    if (A.size()%2==0) {
+        val = {min(A[0],A[1]), max(A[0],A[1])};
+        start = 2;
     }
-  }
-  return val;
+    else {
+        val = {A[0],A[0]};
+        start =1;
+    }
+    // 3* n/2 comparision
+    for (int i =start ; i< A.size();i+=2) {
+        int pair_min = min(A[i],A[i+1]);
+        if (pair_min == A[i]) {
+            val.largest = max(A[i+1],val.largest);
+            val.smallest = min(A[i], val.smallest);
+        }else {
+            val.largest = max(A[i],val.largest);
+            val.smallest = min(A[i+1], val.smallest);
+        }
+    }
+    return val;
 }
+
 
 template <>
 struct SerializationTraits<MinMax> : UserSerTraits<MinMax, int, int> {};
