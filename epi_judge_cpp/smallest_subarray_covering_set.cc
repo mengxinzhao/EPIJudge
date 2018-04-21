@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <climits>
 #include <iostream>
+#include <list>
 
 #include "test_framework/test_failure_exception.h"
 #include "test_framework/test_timer.h"
@@ -33,16 +34,14 @@ Subarray FindSmallestSubarrayCoveringSet(
         if (keywords.find(paragraph[i]) != keywords.end()) {
             cache[paragraph[i]] = i;
         }
-        int min_loc = INT_MAX, max_loc = INT_MIN;
+        int min_loc = INT_MAX;
         if (cache.size() == keywords.size()) {
             for (auto  &iter: cache) {
                 if (min_loc > iter.second)
                     min_loc = iter.second;
-                if (max_loc < iter.second)
-                    max_loc = iter.second;
             }
-            if (min_length.length > max_loc - min_loc) {
-                min_length = {min_loc, max_loc, max_loc-min_loc};
+            if (min_length.length > i - min_loc) {
+                min_length = {min_loc, i, i-min_loc};
             }
         }
     }
