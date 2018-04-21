@@ -19,15 +19,14 @@ int LongestSubarrayWithDistinctEntries(const vector<int>& A) {
             cache[A[i]]=i;
         }else {
             // has it cache
-            if (cache[A[i]] < start) // update cache
-                cache.erase(A[i]);
-            else {
+            if (cache[A[i]] >=start) {
                 max_length = max((int)i-start,max_length);
                 // reset the start
                 // at this point we know that A[start] and A[i] is dup
                 // things in between are good
                 start= cache[A[i]]+1;
             }
+            // update cache
             cache[A[i]]=i;
         }
         i++;
