@@ -5,6 +5,7 @@
 #include <climits>
 #include <iostream>
 #include <list>
+#include <algorithm>
 
 #include "test_framework/test_failure_exception.h"
 #include "test_framework/test_timer.h"
@@ -14,6 +15,9 @@ using std::unordered_set;
 using std::vector;
 using std::unordered_map;
 using std::min;
+using std::list;
+using std::prev;
+
 struct Subarray {
   int start, end;
 };
@@ -48,6 +52,42 @@ Subarray FindSmallestSubarrayCoveringSet(
 
   return {min_length.start,min_length.end};
 }
+
+// O(N) time: N: number of words in paragraph
+// Theoretically it should be faster but when it runs
+// it doesn't beat the first one.
+// I think the cost of doing more complicated data structure overweighs the performance when
+// the keyword numbers are not that many
+Subarray FindSmallestSubarrayCoveringSet_List(
+         const vector<string> &paragraph, const unordered_set<string> &keywords) {
+    
+    list<int> loc; // track location of each element in the keywords. the head is latest starting point
+    // track the latest starting point of each keyword
+    unordered_map<string, list<int>::iterator> cache;
+    
+    int  min_length = INT_MAX;
+    Subarray result = {0,0};
+    for (int i=0;i< paragraph.size();i++) {
+        if (keywords.find(paragraph[i]) != keywords.end()) {
+            if ( cache.find(paragraph[i])!= cache.end()) {
+                // erase the previous location
+                loc.erase(cache[paragraph[i]]);
+            }
+            // update to the latest location
+            loc.emplace_back(i);
+            cache[paragraph[i]]  = prev(loc.end());
+            
+            if (cache.size() == keywords.size()) {
+                if (min_length > loc.back() - loc.front() ){
+                    result = {loc.front(), loc.back()};
+                    min_length = loc.back() - loc.front() ;
+                }
+            }
+        }
+    }
+    return result;
+}
+
 
 int FindSmallestSubarrayCoveringSetWrapper(
     TestTimer &timer, const vector<string> &paragraph,
