@@ -36,7 +36,7 @@ int LongestContainedRange(vector<int>& A) {
 }
 
 // union find.
-// O(N^2) worst time  if all sequences have no gap and have to merge N-1 in the inner loop
+// O(N) worst time  if all sequences have no gap and have to merge N-1 in the inner loop
 int LongestContainedRange_Unionfind(const vector<int> &A) {
     unordered_map<int, int > cache;// map element to its index
     vector<int> rank(A.size(),1); // number of nodes under the root at index i
@@ -52,24 +52,34 @@ int LongestContainedRange_Unionfind(const vector<int> &A) {
     // if A0...An is consecutive subarray and A[i] < A[i+1] < ...A[n], map A[i] to n
     // till there is no element can be merged
     for (auto  elem : cache) {
-        //std::cout<<"checking... "<<elem.first << "@ " <<  elem.second<<std::endl;
         auto smaller_by_one = cache.find(elem.first-1);
-        if (smaller_by_one!= cache.end()) {
-            while(smaller_by_one!= cache.end()
-                  &&roots[smaller_by_one->second] == smaller_by_one->second) {
-                // merge small cluster to a bigger cluster by changing
-                // the parent pointer of the smaller cluster head
-                roots[smaller_by_one->second] = elem.second;
-                // parent's rank increase
-                rank[elem.second] += rank[smaller_by_one->second];
-                // find the next cluster
-                smaller_by_one = cache.find(smaller_by_one->first-1);
-            }
+        while(smaller_by_one!= cache.end()
+              &&roots[smaller_by_one->second] == smaller_by_one->second) {
+            // merge small cluster to a bigger cluster by changing
+            // the parent pointer of the smaller cluster head
+            roots[smaller_by_one->second] = elem.second;
+            // parent's rank increase
+            rank[elem.second] += rank[smaller_by_one->second];
+            // find the next cluster
+            int next = smaller_by_one->first-1;
+            // delete the cache. now we only need to know its parent node
+            cache.erase(smaller_by_one->first);
+            smaller_by_one = cache.find(next);
+        }
+        auto bigger_by_one = cache.find(elem.first+1);
+        while(bigger_by_one!= cache.end()
+              &&roots[bigger_by_one->second] == bigger_by_one->second) {
+            roots[bigger_by_one->second] = elem.second;
+            rank[elem.second] += rank[bigger_by_one->second];
+            int next = bigger_by_one->first+1;
+            cache.erase(bigger_by_one->first);
+            bigger_by_one = cache.find(next);
+        }
+        
         if (max_count < rank[elem.second])
             max_count = rank[elem.second];
-        }
     }
-
+    
     // return the cluster that has the most children.
     return max_count;
 }
