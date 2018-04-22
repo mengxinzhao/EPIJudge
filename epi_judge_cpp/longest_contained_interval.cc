@@ -1,18 +1,16 @@
 #include <vector>
 #include <algorithm>
 #include <unordered_map>
-#include <map>
 #include <climits>
-#include <iterator>
 #include <iostream>
 #include <utility>
+
 using std::vector;
 using std::max;
 using std::unordered_map;
 using std::sort;
-using std::distance;
-using std::map;
-using std::pair;
+
+
 // sort the vector
 // the problem reduced to find the longest consective subarray -remove duplicated
 // O(nlogn) running time
@@ -37,45 +35,43 @@ int LongestContainedRange(vector<int>& A) {
     return max_length;
 }
 
-// union find. not efficient. need path compression 
-#include <utility>
+// union find.
+// O(N^2) worst time  if all sequences have no gap and have to merge N-1 in the inner loop
 int LongestContainedRange_Unionfind(const vector<int> &A) {
-    unordered_map<int, pair<int,bool> > cache;// map element to its index
-    unordered_map<int, int> count_freq;   //map root element loc to the number of children under it
-    
+    unordered_map<int, int > cache;// map element to its index
+    vector<int> rank(A.size(),1); // number of nodes under the root at index i
+    vector<int> roots(A.size(),0); // track the ith node's parent point. initialize to itself
+    // init
     for (size_t i= 0; i< A.size();i++) {
-        if (cache.find(A[i]) == cache.end())
-            cache[A[i]] = {i, false};
+        cache[A[i]] = i;
+        roots[i]=i;
+        
     }
-    
+    int max_count = 1;
     // union the element to its parent that satisfies the constraints
     // if A0...An is consecutive subarray and A[i] < A[i+1] < ...A[n], map A[i] to n
     // till there is no element can be merged
-    for (auto iter= cache.begin(); iter!= cache.end();iter++) {
-        //std::cout<<"checking... "<<iter->first << "@ " <<  iter->second.first<<std::endl;
-        if (iter->second.first == distance(A.begin(),A.begin()+iter->second.first ) && iter->second.second == false)   {// equal to its original loc, otherwise this element has been merged-ed
-            auto curr = iter;
-            auto smaller_by_one = cache.find(curr->first-1);
-            while(smaller_by_one!= cache.end()) {
-                smaller_by_one->second.first = curr->second.first;
-                smaller_by_one->second.second  = true;
-                count_freq[curr->second.first]++;
-                curr = smaller_by_one;
-                smaller_by_one = cache.find(curr->first-1);
+    for (auto  elem : cache) {
+        //std::cout<<"checking... "<<elem.first << "@ " <<  elem.second<<std::endl;
+        auto smaller_by_one = cache.find(elem.first-1);
+        if (smaller_by_one!= cache.end()) {
+            while(smaller_by_one!= cache.end()
+                  &&roots[smaller_by_one->second] == smaller_by_one->second) {
+                // merge small cluster to a bigger cluster by changing
+                // the parent pointer of the smaller cluster head
+                roots[smaller_by_one->second] = elem.second;
+                // parent's rank increase
+                rank[elem.second] += rank[smaller_by_one->second];
+                // find the next cluster
+                smaller_by_one = cache.find(smaller_by_one->first-1);
             }
+        if (max_count < rank[elem.second])
+            max_count = rank[elem.second];
         }
     }
-    
+
     // return the cluster that has the most children.
-    int max_count = INT_MIN;
-    if (count_freq.size()>0) {
-        for (auto &iter:count_freq){
-            if (max_count < iter.second)
-                max_count = iter.second;
-        }
-    }else
-        max_count = 0;
-    return max_count+1;
+    return max_count;
 }
 
 #include "test_framework/test_utils_generic_main.h"
@@ -83,6 +79,6 @@ int LongestContainedRange_Unionfind(const vector<int> &A) {
 int main(int argc, char* argv[]) {
   std::vector<std::string> param_names{"A"};
   generic_test_main(argc, argv, param_names, "longest_contained_interval.tsv",
-                    &LongestContainedRange);
+                    &LongestContainedRange_Unionfind);
   return 0;
 }
