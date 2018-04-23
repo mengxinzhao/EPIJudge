@@ -28,7 +28,7 @@ struct range{
 bool RangeFitsOneJug(int L, int H,const vector<Jug>& Jugs) {
     for (size_t i=0; i< Jugs.size();i++) {
         //std::cout<<L<<", "<< H <<std::endl;
-        if (L <= Jugs[i].low && H <= Jugs[i].high)
+        if (L <= Jugs[i].low && Jugs[i].high<=H)
             return true;
     }
     return false;
@@ -37,22 +37,20 @@ bool RangeFitsOneJug(int L, int H,const vector<Jug>& Jugs) {
 
 bool CheckFeasible_Recursive(const vector<Jug>& Jugs, int L, int H, set<range> & cache) {
     //std::cout<<L<<", "<< H <<std::endl;
-    if (L <0|| H<0) {
-        cache.emplace(L,H);
+    if ((L <0 || H<0) || cache.find({L,H})!= cache.end()) {
         return false;
-    }
-    if (cache.find({L,H})!= cache.end())
-        return false;
-    
-    if (RangeFitsOneJug(L,H,Jugs)) {
-        return true;
     }
 
     for (size_t i=0; i< Jugs.size();i++) {
         int ll = L-Jugs[i].low;
         int hh = H-Jugs[i].high;
-        if (CheckFeasible_Recursive(Jugs, min(ll,hh), max(ll,hh),cache))
+        // the lower range  L needs to be less than jug's high measure mark
+        // the higher range H needs to be bigger
+        // so the last measure will for sure measures the range of [L,Jugs[i].high]
+        if ((L <= Jugs[i].high && Jugs[i].low <=H)|| CheckFeasible_Recursive(Jugs, min(ll,hh), max(ll,hh),cache)){
+            //std::cout<<L<<", "<< H <<" feaisble"<<std::endl;
                 return true;
+        }
     }
     cache.emplace(L,H);
     return false;
