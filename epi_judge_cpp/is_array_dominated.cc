@@ -6,7 +6,8 @@
 #include "test_framework/test_timer.h"
 
 using std::vector;
-
+using std::sort;
+using std::min;
 class Team {
  public:
   explicit Team(const vector<int>& height) {
@@ -15,8 +16,16 @@ class Team {
   }
 
   // Checks if team0 can be placed in front of team1.
+  // sort the two teams by height. Team0 ith placement needs to be shorter than team1 ith placement
   static bool ValidPlacementExists(const Team& team0, const Team& team1) {
-    // Implement this placeholder.
+      vector<Player> sorted0 = team0.get_sorted_players();
+      vector<Player> sorted1 = team1.get_sorted_players();
+      for (int i=0; i < min(sorted0.size(),sorted1.size()); i++) {
+          if (sorted0[i] < sorted1[i] == false)
+              return false;
+      }
+      
+
     return true;
   }
 
@@ -26,6 +35,12 @@ class Team {
 
     int height;
   };
+    
+    vector<Player> get_sorted_players() const {
+        vector<Player> sorted(players_);
+        sort(sorted.begin(),sorted.end());
+        return sorted;
+  }
 
   vector<Player> players_;
 };
