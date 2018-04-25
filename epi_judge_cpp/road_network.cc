@@ -57,10 +57,11 @@ int check_proposal( int n, vector<vector<int>> &paths, const HighwaySection &p) 
 
     int total_imprv=0;
     for (int i=0; i<n;i++)
-        for (int j=0; j<n;j++) {
+        for (int j=i+1; j<n;j++) {
             //  bi-directional
             int src_imprv = paths[i][j] - (paths[i][p.x] + p.distance + paths[p.y][j]) ;
             int dst_imprv = paths[i][j] - (paths[i][p.y] + p.distance + paths[p.x][j]);
+            //if this path leads to more distance it doesn't change the overall shortest path
             total_imprv += max(max(src_imprv, dst_imprv),0);
 
         }
