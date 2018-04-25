@@ -14,7 +14,6 @@ using std::bind;
 using std::vector;
 
 void RandomSampling(int k, vector<int>* A_ptr) {
-  // Implement this placeholder.
   vector<int> &v = *A_ptr;
   int size = v.size();
   std::default_random_engine generator (time(0));
