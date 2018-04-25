@@ -2,6 +2,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include "test_framework/test_failure_exception.h"
 #include "test_framework/test_timer.h"
@@ -9,14 +10,19 @@
 
 using std::string;
 using std::vector;
+using std::sort;
 
 struct Person {
   int age;
   string name;
+  bool operator < (const Person &p ) const{
+      return ((age< p.age )|| ((age == p.age) &&(name.compare(p.name) < 0)));
+  }
 };
 
 void GroupByAge(vector<Person>* people) {
-  // Implement this placeholder.
+    vector<Person> &pple = *people;
+    sort(pple.begin(), pple.end());
   return;
 }
 
