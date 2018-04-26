@@ -6,11 +6,11 @@
 #include <queue>
 #include <cassert>
 #include <functional>
+#include <cassert>
 #include "test_framework/test_timer.h"
 
 using std::string;
 using std::vector;
-using std::set;
 using std::queue;
 struct Cell {
     int y;
@@ -19,109 +19,114 @@ struct Cell {
     bool operator==(const Cell &rhs) {
         return y == rhs.y && x == rhs.x;
     }
-};
-struct Compare
-{
-    bool operator()(const Cell& lhs, const Cell& rhs)
-    {
-        return (lhs.x < rhs.x || ((lhs.x == rhs.x) && (lhs.y<rhs.y)));
+    bool operator!= (const Cell&rhs) {
+        return !( *this == rhs);
     }
-    
 };
 
-bool IsFeasible(vector<vector<char>> &board,set<Cell,Compare> &cells_to_visit,Cell cand) {
+bool Is_feasible(vector<vector<char>> &board,vector<vector<int>> &visited,Cell cand) {
     return (cand.y>= 0 && cand.y < board.size() && cand.x>=0
             && cand.x<board[cand.y].size() && board[cand.y][cand.x] =='W'
-            && cells_to_visit.find(cand)!=cells_to_visit.end());
+            && visited[cand.y][cand.x] == false);
 }
 
-void DFS(vector<vector<char>> &board,set<Cell,Compare> &cells_to_visit,
-         Cell current,vector<Cell> &region) {
-    cells_to_visit.erase(current);
-    region.push_back(current);
-    vector<Cell>candidates = {{current.y+1, current.x}, {current.y-1,current.x}, {current.y, current.x+1}, {current.y,current.x-1}};
+
+bool is_at_boundary(Cell loc, vector<vector<char>> &grid) {
+    return ((loc.y ==0 || loc.y== grid.size() -1 || loc.x==0 || loc.x == grid[0].size()-1 ));
+}
+
+// DFS + union to get the connected component
+// the problem is the stack might run too deep and cause stack overflow
+void DFS(Cell loc, Cell parent,vector<vector<char>> &grid,vector<vector<Cell>> &A, vector<vector<int>> &visited) {
+    visited[loc.y][loc.x] = true;
+
+    if (is_at_boundary(loc, grid)&& is_at_boundary(parent,grid)==false &&  grid[loc.y][loc.x] == 'W') {
+        A[parent.y][parent.x] = loc;
+        A[loc.y][loc.x] = loc;
+    }else {
+        A[loc.y][loc.x] = A[parent.y][parent.x];
+    }
     
+    vector<Cell>candidates = {{loc.y+1, loc.x}, {loc.y-1,loc.x}, {loc.y, loc.x+1}, {loc.y,loc.x-1}};
     for (auto &cand: candidates) {
-        if (IsFeasible(board,cells_to_visit, cand) ) {
-            DFS( board, cells_to_visit, cand,region);
+        if (Is_feasible(grid,visited, cand) ) {
+            DFS(cand,parent, grid, A, visited);
         }
     }
-    return;
 }
 
-void BFS(vector<vector<char>> &board, set<Cell, Compare> &cells_to_visit,
-         Cell current,vector<Cell> &region) {
+// BFS + union to get the connected component
+// the parent pointer is set to be the initial node that invokes the BFS
+// and later changed to the 1st boundary cell in the BFS discovery
+
+void BFS(Cell loc, Cell parent,vector<vector<char>> &grid,vector<vector<Cell>> &A, vector<vector<int>> &visited) {
+    
     queue<Cell> graph_q;
-    graph_q.push(current);
-    cells_to_visit.erase(current);
+    graph_q.push(loc);
+    visited[loc.y][loc.x] = true;
+    
     while(!graph_q.empty()) {
         Cell curr = graph_q.front();
-        region.push_back(curr);
+        if (is_at_boundary(curr, grid)&& is_at_boundary(parent,grid)==false &&  grid[curr.y][curr.x] == 'W') {
+            // change the parent pointer of the group
+            A[parent.y][parent.x] = curr;
+            A[curr.y][curr.x] = curr;
+            parent = curr;
+        }else {
+            A[curr.y][curr.x] = A[parent.y][parent.x];
+        }
+        
         graph_q.pop();
         
         vector<Cell>candidates = {{curr.y+1, curr.x}, {curr.y-1,curr.x}, {curr.y, curr.x+1}, {curr.y,curr.x-1}};
         
         for (auto cand: candidates) {
-            if (IsFeasible(board,cells_to_visit, cand) ) {
-                cells_to_visit.erase(cand);
+            if (Is_feasible(grid,visited, cand) ) {
+                visited[cand.y][cand.x] = true;
                 graph_q.push(cand);
             }
         }
     }
-    return ;
-    
 }
 
+
 void FillSurroundedRegions(vector<vector<char>>* board_ptr) {
-    set<Cell,Compare> cells_to_visit;
-    vector<Cell> white_region;
-    vector<vector<Cell>> white_regions;
-    // O( N*M*log(K)) the size of the board height * width. the number of white cells
-    for (size_t i=0; i< (*board_ptr).size();i++) {
-        for (size_t j=0; j <(*board_ptr)[i].size();j++) {
-            if ((*board_ptr)[i][j] == 'W'){
-                cells_to_visit.emplace(i,j);
+    vector<vector<char>> &board = *board_ptr;
+    vector<vector<Cell>>A(board.size(),vector<Cell>(board[0].size(),{-1,-1}) );
+    vector<vector<int>>visited(A.size(),vector<int>(A[0].size(),false) );
+
+    for (int i=0; i< board_ptr->size();i++)
+        for (int j=0; j< board[i].size();j++)
+            if (board[i][j] == 'W' && visited[i][j] == false){
+                A[i][j] = {i,j};
+                BFS({i,j},{i,j},board,A,visited);
             }
-        }
-    }
-    // O(Klog(K)) K: the number of white cells.log introduced because of underlying set delete
-    // each call of BFS will discover all the nodes in the white connected region
-    while(!cells_to_visit.empty()){
-        auto  iter = cells_to_visit.begin();
-        Cell current = *iter;
-        white_region.clear();
-        //DFS(*board_ptr,cells_to_visit, current,white_region);
-        BFS(*board_ptr,cells_to_visit, current,white_region);
-        if (!white_region.empty())
-            white_regions.push_back(white_region);
-    }
     
-    // for each white regions
-    // if there is one node at the boundary the region is connected to the boundary
-    // if not the entire region will set to 'B'
-    int width = (*board_ptr)[0].size();
-    int height = board_ptr->size();
-    for (size_t i=0; i< white_regions.size();i++) {
-        bool outlet = false;
-        for (size_t j=0; j< white_regions[i].size();j++) {
-            Cell loc = white_regions[i][j];
-            if ((loc.y ==0 || loc.y== height -1 || loc.x==0 || loc.x == width-1 )
-                &&( *board_ptr )[loc.y][loc.x] == 'W') {
-                outlet = true;
-                break;
+    Cell black = {-1,-1};
+    for (int i=0; i< A.size();i++)
+        for (int j=0; j< A[i].size();j++) {
+            if (A[i][j]!= black ) {
+                // check if it has a parent at the boundary or itself is located at the boundary
+                // at most have 2 loops in the while.
+                // for the nodes that are discovered before the 1st boundary node discovered,their parent pointer
+                // is set to the 1st node invoking the BFS.For the nodes that are discovered after 1st boundary node
+                // discoverd A[i][j] directly points to boundary node.
+                // worst case :2 hops to the boundary node. one hop to a node a enclosed in the matrix that is invoking BSF, second hop from a to the boundary node
+                int y = i;
+                int x = j;
+                Cell root = {i,j};
+                while(A[y][x]!= root ) {
+                    root = A[y][x];
+                    y  = root.y;
+                    x =  root.x;
+                }
+                if (is_at_boundary({y,x},board) == false)
+                    board[i][j]= 'B';
             }
         }
-        if (!outlet) {
-            //fill the region
-            for (size_t j=0; j< white_regions[i].size();j++) {
-                Cell loc = white_regions[i][j];
-                ( *board_ptr )[loc.y][loc.x] = 'B';
-            }
-        }
-        
-    }
-    return;
+     return;
 }
+
 
 vector<vector<string>> FillSurroundedRegionsWrapper(
     TestTimer& timer, vector<vector<string>> board) {
