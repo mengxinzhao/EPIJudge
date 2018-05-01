@@ -19,7 +19,6 @@ bool _IsBinaryTreeBST(const unique_ptr<BinaryTreeNode<int>>& node, int left, int
 }
 
 bool IsBinaryTreeBST(const unique_ptr<BinaryTreeNode<int>>& tree) {
-  // Implement this placeholder.
   // left node  < root < right node
 	return _IsBinaryTreeBST(tree,INT_MIN,INT_MAX);
 }
