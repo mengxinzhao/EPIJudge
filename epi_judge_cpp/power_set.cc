@@ -52,7 +52,7 @@ vector<vector<int>> GeneratePowerSet(const vector<int>& input_set) {
 }
 
 // subset[i] = A[i] U subset[i-1]
-// subset[i] = {}
+// subset[0] = {}
 // i: number of element
 // subset[i-1] element 2^(i-1)
 // O(n * 2^(n)) run time complexity
