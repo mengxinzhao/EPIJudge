@@ -2,86 +2,75 @@
 
 #include "bst_node.h"
 #include <set>
+#include <iostream>
 #include <stack>
 
 using std::unique_ptr;
+using std::stack;
 
-// need to use BST property
+// when k's found, and it has a right branch, the result is the leftest child on its right branch
+// if it doesn't have right branch, the result is the k first parent nodes > k.
+// that is the first parent node that is taking the left turn to find k
+
+// when k is not in BST tree, when iterating to the end leave j
+// if k < j, j is the result (that means if k exist k is the j's left child
+// if k > j , the 1st parent along the path > k is result
 BstNode<int>* FindFirstGreaterThanK(const unique_ptr<BstNode<int>>& tree,
                                     int k) {
-  // Implement this placeholder.
-	BstNode<int> * p = tree.get();
+
+	BstNode<int> * p = tree.get(); // travelling node
 	BstNode<int> * q = nullptr;
-	if (p == nullptr)
-		return nullptr;
-	// find the first node > k along the path
-	while (p && p->data <= k) {
-		q = p;
-		p = p->right.get();
-	}
-	// the most right node still less than k. no hope return
-	if (p == nullptr)
-		return nullptr;
-	// the first node > k. the value lies in its left tree
-	if (p->left.get() == nullptr)
-		return p;
-	//left -> node-> right travel the subtree with root p
-	//return the first node value > k
-	std::stack<BstNode<int> *>path;
-	std::set<BstNode <int> * >seen;
-	path.push(p);
-	while(!path.empty()) {
-		p = path.top();
-		while(p->left.get() && seen.find(p->left.get())==seen.end()) {
-			path.push(p->left.get());
-			p = p->left.get();
-		}
-		p = path.top();
-		seen.insert(p);
-		// visit
-		if (p->data > k)
-			return p;
-		path.pop();
-
-		if (p->right.get()) {
-			path.push(p->right.get());
-		}
-
-	}
-
-  return nullptr;
-}
-
-// need to use BST property
-// if key doesn't exist or no key larger than k is present return nullptr
-BstNode<int>* FindFirstGreaterThanK2(const unique_ptr<BstNode<int>>& tree,
-                                    int k) {
-	// Implement this placeholder.
-	BstNode<int> * p = tree.get();
-	BstNode<int> * q = nullptr;
-	BstNode<int> *r = nullptr;
-
+    stack<BstNode<int> *> parents; // tracking parents node that is making left turn
 	while(p) {
+        //std::cout<<"checking "<<p->data<<std::endl;
 		if (p->data > k) {
-			p = p->left.get();
-			q = p;
+            parents.push(p);
+            p = p->left.get();
 		}else if (p->data == k) {
-			r = q;
-			q = p->right.get();
+            q = p->right.get(); //it's right child;
 			break;
-		}else if (p->data<k)
+        }else if (p->data<k) {
 			p = p->right.get();
+        }
 	}
-
-	if (!p) return nullptr; // key not found
-	else if (q) return r; // key found and has right node
-	else return q;  // key found but no right node return its ancester that > k
+    
+    if (!p ) {// not in BST
+        if (parents.size()>0) {
+            if ( k < parents.top()->data ) {
+                return parents.top();
+            }
+           else {
+               while(parents.top()->data < k) {
+                   parents.pop();
+               }
+               return parents.top();
+           }
+        }else // a null root
+            return nullptr;
+    } else { // in BST
+        if (q == nullptr) {// no right child
+            if (!parents.empty()){
+                while(parents.top()->data < k) {
+                    parents.pop();
+                }
+                return parents.top();
+            }else
+                return nullptr;
+        }
+        else { // has right child
+            while(q->left )
+                q = q->left.get();
+            return q;
+        }
+    }
+    
 }
+
 
 
 
 int FindFirstGreaterThanKWrapper(const unique_ptr<BstNode<int>>& tree, int k) {
-  auto result = FindFirstGreaterThanK2(tree, k);
+  auto result = FindFirstGreaterThanK(tree, k);
   return result ? result->data : -1;
 }
 
