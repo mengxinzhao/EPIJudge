@@ -1,39 +1,83 @@
 #include <vector>
 #include <unordered_map>
-
+#include <stack>
+#include <memory>
+#include <numeric>      // std::accumulate
+#include <iostream>
 using std::vector;
-using std::unordered_map;
+using std::accumulate;
+using std::stack;
 
-// DP[i,j] denotes target i can be reached by using up to [0,jth] digit.With j+1th digit, possible numbers are
-// DP[n,i] * 10 + digits[j+1] or DP[n,i] + digits[j+1] or  DP[n,i] * digits[j+1]
-// base case
-// DP[i,0] = true if digits[0] == i else false
-
-//
-bool ExpressionSynthesisHelper(const vector<int> & digits, int i, int target,unordered_map<int, int> &cache) {
-    if (i==0 ) {
-        if (target == digits[0])
-            return true;
-        else
-            return false;
-    }
-    if (cache.find(target) != cache.end())
-        return false;
+int EvaluateExpression(vector<char> &operators,vector<int>  &operands) {
     
-    // try all possible candidates
-    vector <int> new_targets = {target - digits[i], (target - digits[i])/10, target / digits[i]};
-    for (auto candidate: new_targets ) {
-        if (ExpressionSynthesisHelper(digits, i-1, candidate,cache) == true)
-            return true;
+    stack<int> intermediate_operands;
+    int operand_idx = 0;
+    intermediate_operands.push(operands[operand_idx++]);
+    // Evaluates '*' first.
+    for (char oper : operators) {
+        if (oper == '*') {
+            //std::cout<< intermediate_operands.top() << " x "<<operands[operand_idx];
+            int product = intermediate_operands.top() * operands[operand_idx++];
+            intermediate_operands.pop();
+            intermediate_operands.push(product);
+        } else {  // oper == '+'.
+            //std::cout<<  " + "<<operands[operand_idx];
+            intermediate_operands.push(operands[operand_idx++]);
+        }
     }
-    // cache unsuccessful candidate
-    cache[target] = i;
+    
+    // Evaluates '+' second.
+    int sum = 0;
+    while (!intermediate_operands.empty()) {
+        sum += intermediate_operands.top();
+        intermediate_operands.pop();
+    }
+    return sum;
+}
+
+bool ExpressionSynthesisHelper(const vector<int> & digits, int i,int current_term,
+               int target,vector<char> &operators, vector<int> &operands) {
+    
+    current_term = current_term*10 + digits[i];
+    if (i==digits.size()-1) {
+        operands.push_back(current_term);
+        if (EvaluateExpression(operators,operands) == target)
+            return true;
+        operands.pop_back();
+        return false;
+    }
+    
+    // no operator merge
+    if (ExpressionSynthesisHelper(digits, i+1,current_term, target, operators, operands) == true)
+        return true;
+    
+    // try *
+    operands.push_back(current_term);
+    operators.push_back('*');
+    if (ExpressionSynthesisHelper(digits, i+1,0, target, operators, operands) == true)
+        return true;
+    operands.pop_back();
+    operators.pop_back();
+    
+    // try +
+    operands.push_back(current_term);
+    operators.push_back('+');
+    if (ExpressionSynthesisHelper(digits, i+1,0, target, operators, operands) == true)
+        return true;
+    operators.pop_back();
+    operands.pop_back();
+    
+    
+    // nothing works here
     return false;
 }
 
 bool ExpressionSynthesis(const vector<int>& digits, int target) {
-    unordered_map<int, int> cache;// to cache  unsuccessful try when a target k can't archieved by using up to ith digits
-    return ExpressionSynthesisHelper(digits, digits.size()-1, target,cache);
+
+    vector<int>operands;
+    vector<char>operators;
+
+    return ExpressionSynthesisHelper(digits, 0, 0,target,operators,operands);
 }
 
 #include "test_framework/test_utils_generic_main.h"
