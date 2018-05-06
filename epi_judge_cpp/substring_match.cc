@@ -1,10 +1,11 @@
 #include <string>
 #include <cstddef>
 #include <iostream>
+#include <cstdint>
 #include <cmath>
 
 using std::string;
-using std::pow;
+
 // Returns the index of the first character of the substring if found, -1
 // otherwise.
 // implementation refers to MIT algorithm class
@@ -16,13 +17,21 @@ using std::pow;
 // next hash
 // H(1..k) = { c1* a^(k-1) + c2 * a^(k-2) + ...ck-1 * a + ck = a( H(0...k-1) - c0*a^(k-1)) + ck   mod M
 unsigned int M = 1021; //prime 
-int A = 26; //base
+int A = 3; // base too big might  have overflow problem
 
-int rolling_hash(const string &s) {
+// integer pow
+int pow(int base, int exp) {
+    int power = 1;
+    for (int i=0; i<exp; i++) {
+        power *= base;
+    }
+    return power;
+}
+uint64_t hash(const string &s) {
     int H = 0;
     int k = s.length();
     for (size_t i=0; i< k;i++) {
-        H = ((H * A  + (s[i] - 'A'))) %M;
+        H = ((H * A  + (s[i] - 0)));
     }
     return H ;
 }
@@ -33,29 +42,22 @@ int RabinKarp(const string &t, const string &s) {
         return -1;
     if (s.length() == 0) // s is an emtry string
         return 0;
-    
-    int Hs = rolling_hash(s);
-    int Ht = rolling_hash(t.substr(0, s.length()));
+
+    uint64_t Hs = hash(s);
+    uint64_t Ht = hash(t.substr(0, s.length()));
     int k = s.length();
 
-    std::cout<<"Hs: " << Hs<< std::endl;
-    std::cout<<"Ht: "<< Ht << std::endl;
-    
     if (Hs == Ht) {
         if (t.compare(0, s.length(),s) == 0)
             return 0;
     }
 
-    int power = (int )pow(A, (k-1)) % M;
-    std::cout<<"power:" << (int )pow(A, (k-1)) % M<<std::endl;
+    uint64_t power = pow(A, (k-1)) ;
     for (int i=s.length(); i< t.length();i++) {
         // move the window
-        Ht -= (( t[i-k] -'A' )* power) % M;
-        if (Ht < 0 ) {
-            Ht += M;
-        }
-        Ht = (A*Ht + (t[i]-'A') ) %M;
-        //Ht = (A *( Ht - (t[i-k]-'A') *  (int)pow(A,(k-1))) +  t[i] -'A'  ) %M;
+        //Ht = A *( Ht - (t[i-k]) * power ) +  t[i] ;
+        Ht -= t[i - k ] * power;
+        Ht = Ht * A + t[i];
         if (Ht == Hs){
             // check if it is a true match
             if (t.compare(i-k+1,k,s) == 0)
