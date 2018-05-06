@@ -17,7 +17,7 @@ using std::string;
 // next hash
 // H(1..k) =  c1* a^(k-1) + c2 * a^(k-2) + ...ck-1 * a + ck = a( H(0...k-1) - c0*a^(k-1)) + ck   mod M
 
-int A = 3; // base too big might  have overflow problem
+int A = 26;
 
 // integer pow
 uint64_t pow(int base, int exp) {
@@ -28,7 +28,7 @@ uint64_t pow(int base, int exp) {
     return power;
 }
 uint64_t hash(const string &s) {
-    int H = 0;
+    uint64_t H = 0;
     int k = s.length();
     for (size_t i=0; i< k;i++) {
         H = ((H * A  + (s[i] - 0)));
