@@ -15,13 +15,13 @@ using std::string;
 // c1...ck input char
 // k length of the string
 // next hash
-// H(1..k) = { c1* a^(k-1) + c2 * a^(k-2) + ...ck-1 * a + ck = a( H(0...k-1) - c0*a^(k-1)) + ck   mod M
-unsigned int M = 1021; //prime 
+// H(1..k) =  c1* a^(k-1) + c2 * a^(k-2) + ...ck-1 * a + ck = a( H(0...k-1) - c0*a^(k-1)) + ck   mod M
+
 int A = 3; // base too big might  have overflow problem
 
 // integer pow
-int pow(int base, int exp) {
-    int power = 1;
+uint64_t pow(int base, int exp) {
+    uint64_t power = 1;
     for (int i=0; i<exp; i++) {
         power *= base;
     }
@@ -55,7 +55,6 @@ int RabinKarp(const string &t, const string &s) {
     uint64_t power = pow(A, (k-1)) ;
     for (int i=s.length(); i< t.length();i++) {
         // move the window
-        //Ht = A *( Ht - (t[i-k]) * power ) +  t[i] ;
         Ht -= t[i - k ] * power;
         Ht = Ht * A + t[i];
         if (Ht == Hs){
