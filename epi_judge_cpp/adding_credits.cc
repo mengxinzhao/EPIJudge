@@ -1,5 +1,6 @@
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <map>
 #include <utility>
 #include <cassert>
@@ -10,28 +11,27 @@ using std::string;
 using std::unordered_map;
 using std::map;
 using std::pair;
+using std::unordered_set;
 
 class ClientsCreditsInfo {
  public:
   void Insert(const string& client_id, int c) {
-      std::cout<<"adding " << client_id << " " << c<<std::endl;
-      if (credits_info.find(client_id) != credits_info.end()) {
-          // remove the existing one and  update later
-          map<int, string >::iterator loc = credits_info[client_id];
-          std::cout<<"existing " << client_id << " " << loc->first<<std::endl;
-          clients_info.erase(loc);
-          credits_info.erase(client_id);
-      }
-      pair <map<int, string >::iterator, bool> result  = clients_info.insert(pair< int, string> (c-credit_offset,client_id) );
-      credits_info[client_id] = result.first;
+      Remove(client_id);
+      
+      clients_info[c-credit_offset].insert(client_id );
+      credits_info[client_id] = c-credit_offset;
       return;
   }
 
   bool Remove(const string& client_id) {
       if (credits_info.find(client_id)!= credits_info.end()) {
-          map<int, string >::iterator loc = credits_info[client_id];
-          std::cout<<"removing " << loc->second << " " << loc->first <<std::endl;
-          clients_info.erase(loc);
+          int credit_score = credits_info[client_id];
+          auto all_candidats = clients_info.find(credit_score) ;
+          if (all_candidats != clients_info.end()) {
+              auto cand = all_candidats->second.find(client_id) ;
+              if (cand != all_candidats->second.end())
+                  all_candidats->second.erase(cand);
+          }
           credits_info.erase(client_id);
           return true;
       }
@@ -39,10 +39,8 @@ class ClientsCreditsInfo {
   }
 
   int Lookup(const string& client_id)  {
-      std::cout<<"looking up " << client_id<<std::endl;
       if (credits_info.find(client_id)!= credits_info.end()) {
-          map<int, string >::iterator loc  = credits_info[client_id];
-          return loc->first + credit_offset;
+          return credits_info[client_id] + credit_offset;
       }
       return -1;
   }
@@ -56,15 +54,15 @@ class ClientsCreditsInfo {
   string Max() const {
       auto max_iter  = clients_info.rbegin();
       if (max_iter!= clients_info.rend()) {
-          return max_iter->second;
+          return *max_iter->second.begin();
       }
       else
           return "";
   }
 private:
     int credit_offset = 0;
-    unordered_map<string, map<int, string> :: iterator > credits_info; // map each client to its credits
-    map<int, string> clients_info ;// map each credits to its client info
+    unordered_map<string,int > credits_info; // map each client to its credits
+    map<int, unordered_set<string>> clients_info ;// map each credits to  all clients that have the same credits
 };
 
 struct Operation {
