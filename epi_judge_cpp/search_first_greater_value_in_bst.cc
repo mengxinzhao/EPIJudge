@@ -66,11 +66,27 @@ BstNode<int>* FindFirstGreaterThanK(const unique_ptr<BstNode<int>>& tree,
     
 }
 
-
+// simplify the logic
+// travel to the leaf following the normal search path
+// the first greater than k node is either the closet parent node that makes the left turn regardless if k is in BST or not
+// or its right node if k is in BST
+BstNode<int>* FindFirstGreaterThanK2(const unique_ptr<BstNode<int>>& tree,
+                                    int k) {
+    BstNode<int>*subtree = tree.get(), *first_so_far = nullptr;
+    while (subtree) {
+        if (subtree->data > k) {
+            first_so_far = subtree;
+            subtree = subtree->left.get();
+        } else {  // Root and all keys in left subtree are <= k, so skip them.
+            subtree = subtree->right.get();
+        }
+    }
+    return first_so_far;
+}
 
 
 int FindFirstGreaterThanKWrapper(const unique_ptr<BstNode<int>>& tree, int k) {
-  auto result = FindFirstGreaterThanK(tree, k);
+  auto result = FindFirstGreaterThanK2(tree, k);
   return result ? result->data : -1;
 }
 
