@@ -15,7 +15,6 @@ using std::unique_ptr;
 BstNode<int>* FindLCA(const unique_ptr<BstNode<int>>& tree,
                       const unique_ptr<BstNode<int>>& s,
                       const unique_ptr<BstNode<int>>& b) {
-  // Implement this placeholder.
 	BstNode<int> *p = tree.get();
 	while(p) {
 		if (p->data > b.get()->data) { // > the bigger one between the two
