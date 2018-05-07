@@ -22,12 +22,7 @@ BstNode<int>* FindLCA(const unique_ptr<BstNode<int>>& tree,
 			p = p->left.get();
 		}else if (p->data < s.get()->data) { // < the smaller one between the two
 			p = p->right.get();
-		}else if ((p->data > s.get()->data && p->data < b.get()->data)
-						  ||(p->data == s.get()->data)
-		          || (p->data== b.get()->data))
-			// can't meet both
-			// smaller one gets searched first. bigger node is on its right branch
-			// bigger one gets searched first. smaller node is on its left branch
+		}else if ((p->data >=s.get()->data && p->data <= b.get()->data))
 			return p;
 
 	}
